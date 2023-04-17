@@ -1,7 +1,8 @@
 ﻿using System;
 using UnityEngine;
+using PEC2.Tank;
 
-namespace Complete
+namespace PEC2.Managers
 {
     [Serializable]
     public class TankManager

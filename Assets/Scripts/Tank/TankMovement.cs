@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace Complete
+namespace PEC2.Tank
 {
     public class TankMovement : MonoBehaviour
     {

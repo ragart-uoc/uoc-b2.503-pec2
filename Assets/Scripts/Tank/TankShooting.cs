@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace Complete
+namespace PEC2.Tank
 {
     public class TankShooting : MonoBehaviour
     {

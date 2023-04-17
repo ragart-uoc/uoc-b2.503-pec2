@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Complete
+namespace PEC2.Tank
 {
     public class TankHealth : MonoBehaviour
     {
