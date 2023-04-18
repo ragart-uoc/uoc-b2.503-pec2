@@ -1,27 +1,32 @@
 ﻿using UnityEngine;
 
-namespace Complete
+namespace PEC2.UI
 {
+    /// <summary>
+    /// Class <c>UIDirectionControl</c> is used to make sure world space UI elements such as the health bar face the correct direction.
+    /// </summary>
     public class UIDirectionControl : MonoBehaviour
     {
-        // This class is used to make sure world space UI
-        // elements such as the health bar face the correct direction.
+        /// <value>Property <c>useRelativeRotation</c> represents whether the relative rotation should be used for this gameobject.</value>
+        public bool useRelativeRotation = true;
 
-        public bool m_UseRelativeRotation = true;       // Use relative rotation should be used for this gameobject?
+        /// <value>Property <c>m_RelativeRotation</c> represents the local rotation at the start of the scene.</value>
+        private Quaternion m_RelativeRotation;
 
-
-        private Quaternion m_RelativeRotation;          // The local rotatation at the start of the scene.
-
-
-        private void Start ()
+        /// <summary>
+        /// Method <c>Start</c> is called on the frame when a script is enabled just before any of the Update methods are called the first time.
+        /// </summary>
+        private void Start()
         {
             m_RelativeRotation = transform.parent.localRotation;
         }
 
-
-        private void Update ()
+        /// <summary>
+        /// Method <c>Update</c> is called every frame, if the MonoBehaviour is enabled.
+        /// </summary>
+        private void Update()
         {
-            if (m_UseRelativeRotation)
+            if (useRelativeRotation)
                 transform.rotation = m_RelativeRotation;
         }
     }

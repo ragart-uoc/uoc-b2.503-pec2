@@ -6,50 +6,33 @@
             "id": "50a11bb3-fd21-4899-92bd-7996510ca8aa",
             "actions": [
                 {
+                    "name": "Move",
+                    "type": "PassThrough",
+                    "id": "d894d81d-a619-4297-a0db-eb412c9fcaa4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Fire",
                     "type": "Button",
                     "id": "5d50249a-3b1a-48f9-809e-b5cae999d48d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
-                },
-                {
-                    "name": "MoveTank",
-                    "type": "PassThrough",
-                    "id": "d894d81d-a619-4297-a0db-eb412c9fcaa4",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "TurnTank",
-                    "type": "PassThrough",
-                    "id": "7a79f75b-47f1-443b-8ef9-9eb3f7a8711a",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": ""
+                    "interactions": "Press(behavior=2)",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
-                    "name": "",
-                    "id": "c58cdd4f-cead-4778-9ce1-33609a38022b",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Vertical Axis",
+                    "name": "Arrows",
                     "id": "0f3cb15d-ca1c-4c3b-86b6-140a76162cc9",
                     "path": "2DVector",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveTank",
+                    "action": "Move",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -60,7 +43,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveTank",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -71,20 +54,9 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveTank",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "Horizontal Axis",
-                    "id": "7f125e76-842e-41be-b4d9-1b430a570c9a",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "TurnTank",
-                    "isComposite": true,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "Left",
@@ -93,7 +65,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "TurnTank",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -104,9 +76,20 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "TurnTank",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "c58cdd4f-cead-4778-9ce1-33609a38022b",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -120,7 +103,8 @@
                     "id": "4c97d3fa-624c-40fb-a24a-72177e0f94a7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press"
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": []
