@@ -227,7 +227,7 @@ MonoBehaviour:
   dontDestroyOnLoad: 1
   runInBackground: 1
   autoStartServerBuild: 1
-  autoConnectClientBuild: 1
+  autoConnectClientBuild: 0
   sendRate: 30
   offlineScene: 
   onlineScene: 

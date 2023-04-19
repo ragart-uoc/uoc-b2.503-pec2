@@ -15,7 +15,7 @@ namespace PEC2.Entities
         public string playerName;
 
         /// <value>Property <c>playerColor</c> represents the color of the player tank.</value>
-        [SyncVar]
+        [SyncVar(hook = "ChangeColor")]
         public Color playerColor;
 
         /// <value>Property <c>coloredPlayerText</c> represents the player with their number colored to match their tank.</value>
@@ -37,28 +37,6 @@ namespace PEC2.Entities
 
         /// <value>Property <c>m_CanvasGameObject</c> is used to disable the world space UI during the Starting and Ending phases of each round.</value>
         private GameObject m_CanvasGameObject;
-        
-        /// <summary>
-        /// Method <c>Awake</c> is called when the script instance is being loaded.
-        /// </summary>
-        private void Awake()
-        {
-            // Get player name from PlayerPrefs
-            playerName = PlayerPrefs.GetString("PlayerName", "Player");
-            
-            // Get player color (serialization of color rgb) from PlayerPrefs, default to null
-            var playerColorString = PlayerPrefs.GetString("PlayerColor", null);
-            if (playerColorString != null)
-            {
-                // Convert string to color
-                playerColor = ColorFromString(playerColorString);
-            }
-            else
-            {
-                playerColor = (!isLocalPlayer) ? Color.red : Color.blue;
-            }
-            
-        }
 
         /// <summary>
         /// Method <c>Start</c> is called on the frame when a script is enabled just before any of the Update methods are called the first time.
@@ -70,19 +48,23 @@ namespace PEC2.Entities
             m_Shooting = GetComponent<TankShooting>();
             m_Health = GetComponent<TankHealth>();
             m_CanvasGameObject = GetComponentInChildren<Canvas>().gameObject;
+        }
 
-            // Create a string for the player name using the correct color
-            coloredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
+        /// <summary>
+        /// Method <c>OnStartLocalPlayer</c> is called when the local player object has been set up.
+        /// </summary>
+        public override void OnStartLocalPlayer()
+        {
+            // Get player name from PlayerPrefs
+            playerName = PlayerPrefs.GetString("PlayerName", "Player " + GetComponent<NetworkIdentity>().netId);
+                
+            // Get player color from PlayerPrefs
+            var playerColorString = PlayerPrefs.GetString("PlayerColor", "");
 
-            // Get all of the renderers of the tank
-            var renderers = GetComponentsInChildren<MeshRenderer>();
-
-            // Go through all the renderers...
-            foreach (var r in renderers)
-            {
-                // ... set their material color to the color specific to this tank.
-                r.material.color = playerColor;
-            }
+            // Convert string to color
+            playerColor = playerColorString.Split(',').Length == 3
+                ? ColorFromString(playerColorString)
+                : Color.blue;
         }
 
         /// <summary>
@@ -131,6 +113,27 @@ namespace PEC2.Entities
                 float.Parse(colorRGBArray[0]) / 255f, 
                 float.Parse(colorRGBArray[1]) / 255f, 
                 float.Parse(colorRGBArray[2]) / 255f);
+        }
+        
+        /// <summary>
+        /// Method <c>ChangeColor</c> is used to change the color of the tank.
+        /// </summary>
+        /// <param name="oldColor">The old color of the tank.</param>
+        /// <param name="newColor">The new color of the tank.</param>
+        private void ChangeColor(Color oldColor, Color newColor)
+        {
+            // Get all of the renderers of the tank
+            var renderers = GetComponentsInChildren<MeshRenderer>();
+
+            // Go through all the renderers...
+            foreach (var r in renderers)
+            {
+                // ... set their material color to the color specific to this tank.
+                r.material.color = newColor;
+            }
+            
+            // Create a string for the player name using the correct color
+            coloredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
         }
     }
 }
