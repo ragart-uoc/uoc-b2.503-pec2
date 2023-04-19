@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+using Cinemachine;
 
 namespace PEC2.Managers
 {
@@ -13,6 +14,9 @@ namespace PEC2.Managers
         
         /// <value>Property <c>numberOfEnemies</c> represents the number of enemies to spawn.</value>
         public int numberOfEnemies = 4;
+        
+        /// <value>Property <c>cinemachineTargetGroup</c> is used to add the enemy to the CinemachineTargetGroup.</value>
+        public CinemachineTargetGroup cinemachineTargetGroup;
  
         /// <summary>
         /// Method <c>OnStartServer</c> is invoked for NetworkBehaviour objects when they become active on the server.
@@ -31,6 +35,9 @@ namespace PEC2.Managers
  
                 var enemy = Instantiate(enemyPrefab, spawnPosition, spawnRotation);
                 NetworkServer.Spawn(enemy);
+                
+                // Add to cinemachine target group
+                cinemachineTargetGroup.AddMember(enemy.transform, 1, 1);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Mirror;
+using Cinemachine;
 
 namespace PEC2.Entities
 {
@@ -38,6 +39,9 @@ namespace PEC2.Entities
         /// <value>Property <c>m_CanvasGameObject</c> is used to disable the world space UI during the Starting and Ending phases of each round.</value>
         private GameObject m_CanvasGameObject;
 
+        /// <value>Property <c>m_CinemachineTargetGroup</c> is used to add the tank to the CinemachineTargetGroup.</value>
+        private CinemachineTargetGroup m_CinemachineTargetGroup;
+
         /// <summary>
         /// Method <c>Start</c> is called on the frame when a script is enabled just before any of the Update methods are called the first time.
         /// </summary>
@@ -65,6 +69,10 @@ namespace PEC2.Entities
             playerColor = playerColorString.Split(',').Length == 3
                 ? ColorFromString(playerColorString)
                 : Color.blue;
+            
+            // Add to cinemachine target group
+            m_CinemachineTargetGroup = FindObjectOfType<CinemachineTargetGroup>();
+            m_CinemachineTargetGroup.AddMember(transform, 1, 1);
         }
 
         /// <summary>
