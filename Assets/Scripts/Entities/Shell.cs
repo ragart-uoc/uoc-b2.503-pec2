@@ -7,7 +7,7 @@ namespace PEC2.Entities
     /// <summary>
     /// Class <c>ShellExplosion</c> is used to make the shell explode.
     /// </summary>
-    public class ShellExplosion : NetworkBehaviour
+    public class Shell : NetworkBehaviour
     {
         /// <value>Property <c>tankMask</c> represents the layer mask of the tanks. It's used to filter what the explosion affects It should be set to "Players".</value>
         [FormerlySerializedAs("m_TankMask")]
@@ -17,9 +17,17 @@ namespace PEC2.Entities
         [FormerlySerializedAs("m_ExplosionParticles")]
         public ParticleSystem explosionParticles;
 
+        /// <value>Property <c>audioSOurce</c> represents the audio source.</value>
+        public AudioSource audioSource;
+
+        /// <value>Property <c>fireClip</c> represents the audio that plays when each shot is fired.</value>
+        public AudioClip fireClip;
+        
         /// <value>Property <c>explosionAudio</c> represents the audio that will play on explosion.</value>
-        [FormerlySerializedAs("m_ExplosionAudio")]
-        public AudioSource explosionAudio;
+        public AudioClip explosionClip;
+
+        /// <value>Property <c>launchForce</c> represents the force given to the shell.</value>
+        public float launchForce = 15f;
 
         /// <value>Property <c>maxDamage</c> represents the amount of damage done if the explosion is centred on a tank.</value>
         [FormerlySerializedAs("m_MaxDamage")]
@@ -42,6 +50,13 @@ namespace PEC2.Entities
         /// </summary>
         private void Start()
         {
+            // Set the shell's velocity to the launch force in the fire position's forward direction
+            GetComponent<Rigidbody>().velocity = launchForce * transform.forward;
+
+            // Change the clip to the firing clip and play i
+            audioSource.clip = fireClip;
+            audioSource.Play();
+            
             // If it isn't destroyed by then, destroy the shell after it's lifetime
             Destroy(gameObject, maxLifeTime);
         }
@@ -49,10 +64,10 @@ namespace PEC2.Entities
         /// <summary>
         /// Method <c>OnTriggerEnter</c> is called when a GameObject collides with another GameObject.
         /// </summary>
-        private void OnTriggerEnter (Collider other)
+        private void OnTriggerEnter(Collider other)
         {
 			// Collect all the colliders in a sphere from the shell's current position to a radius of the explosion radius
-            var colliders = Physics.OverlapSphere (transform.position, explosionRadius, tankMask);
+            var colliders = Physics.OverlapSphere(transform.position, explosionRadius, tankMask);
 
             // Go through all the colliders...
             foreach (var c in colliders)
@@ -88,7 +103,9 @@ namespace PEC2.Entities
             explosionParticles.Play();
 
             // Play the explosion sound effect.
-            explosionAudio.Play();
+            audioSource.Stop();
+            audioSource.clip = explosionClip;
+            audioSource.Play();
 
             // Once the particles have finished, destroy the gameobject they are on.
             var mainModule = explosionParticles.main;
@@ -101,7 +118,7 @@ namespace PEC2.Entities
         /// <summary>
         /// Method <c>CalculateDamage</c> calculates the amount of damage a target should take based on its distance to the explosion.
         /// </summary>
-        private float CalculateDamage (Vector3 targetPosition)
+        private float CalculateDamage(Vector3 targetPosition)
         {
             // Create a vector from the shell to the target.
             var explosionToTarget = targetPosition - transform.position;
