@@ -2,6 +2,7 @@
 using UnityEngine;
 using Mirror;
 using Cinemachine;
+using TMPro;
 
 namespace PEC2.Entities
 {
@@ -12,8 +13,11 @@ namespace PEC2.Entities
     public class Tank : NetworkBehaviour
     {
         /// <value>Property <c>playerName</c> represents the name of the player.</value>
-        [SyncVar]
+        [SyncVar(hook = "ChangeName")]
         public string playerName;
+        
+        /// <value>Property <c>playerNameText</c> represents the text component of the player name.</value>
+        public TextMeshProUGUI playerNameText;
 
         /// <value>Property <c>playerColor</c> represents the color of the player tank.</value>
         [SyncVar(hook = "ChangeColor")]
@@ -69,12 +73,12 @@ namespace PEC2.Entities
             playerColor = playerColorString.Split(',').Length == 3
                 ? ColorFromString(playerColorString)
                 : Color.blue;
-            
+
             // Add to cinemachine target group
             m_CinemachineTargetGroup = FindObjectOfType<CinemachineTargetGroup>();
             m_CinemachineTargetGroup.AddMember(transform, 1, 1);
         }
-
+        
         /// <summary>
         /// Method <c>DisableControl</c> is used to disable the tank during the phases of the game where the player shouldn't be able to control it.
         /// </summary>
@@ -97,6 +101,38 @@ namespace PEC2.Entities
             m_Health.enabled = true;
 
             m_CanvasGameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Method <c>ChangeName</c> is used to change the name of the tank.
+        /// </summary>
+        /// <param name="oldName">The old name of the tank.</param>
+        /// <param name="newName">The new name of the tank.</param>
+        private void ChangeName(string oldName, string newName)
+        {
+            // Change the name of the player
+            playerNameText.text = newName;
+        }
+        
+        /// <summary>
+        /// Method <c>ChangeColor</c> is used to change the color of the tank.
+        /// </summary>
+        /// <param name="oldColor">The old color of the tank.</param>
+        /// <param name="newColor">The new color of the tank.</param>
+        private void ChangeColor(Color oldColor, Color newColor)
+        {
+            // Get all of the renderers of the tank
+            var renderers = GetComponentsInChildren<MeshRenderer>();
+
+            // Go through all the renderers...
+            foreach (var r in renderers)
+            {
+                // ... set their material color to the color specific to this tank.
+                r.material.color = newColor;
+            }
+            
+            // Change the color of the player name
+            playerNameText.color = newColor;
         }
         
         /// <summary>
@@ -121,27 +157,6 @@ namespace PEC2.Entities
                 float.Parse(colorRGBArray[0]) / 255f, 
                 float.Parse(colorRGBArray[1]) / 255f, 
                 float.Parse(colorRGBArray[2]) / 255f);
-        }
-        
-        /// <summary>
-        /// Method <c>ChangeColor</c> is used to change the color of the tank.
-        /// </summary>
-        /// <param name="oldColor">The old color of the tank.</param>
-        /// <param name="newColor">The new color of the tank.</param>
-        private void ChangeColor(Color oldColor, Color newColor)
-        {
-            // Get all of the renderers of the tank
-            var renderers = GetComponentsInChildren<MeshRenderer>();
-
-            // Go through all the renderers...
-            foreach (var r in renderers)
-            {
-                // ... set their material color to the color specific to this tank.
-                r.material.color = newColor;
-            }
-            
-            // Create a string for the player name using the correct color
-            coloredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
         }
     }
 }

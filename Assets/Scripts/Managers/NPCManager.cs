@@ -7,8 +7,11 @@ namespace PEC2.Managers
     /// <summary>
     /// Method <c>EnemySpawnManager</c> is used to spawn enemies in the scene.
     /// </summary>
-    public class EnemySpawnManager : NetworkBehaviour
+    public class NPCManager : NetworkBehaviour
     {
+        /// <value>Property <c>_instance</c> represents the singleton instance of the class.</value>
+        private static NPCManager _instance;
+
         /// <value>Property <c>enemyPrefab</c> represents the prefab of the enemy.</value>
         public GameObject enemyPrefab;
         
@@ -17,6 +20,21 @@ namespace PEC2.Managers
         
         /// <value>Property <c>cinemachineTargetGroup</c> is used to add the enemy to the CinemachineTargetGroup.</value>
         public CinemachineTargetGroup cinemachineTargetGroup;
+        
+        /// <summary>
+        /// Method <c>Awake</c> is called when the script instance is being loaded.
+        /// </summary>
+        private void Awake()
+        {
+            // Singleton pattern
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+
+            _instance = this;
+        }
  
         /// <summary>
         /// Method <c>OnStartServer</c> is invoked for NetworkBehaviour objects when they become active on the server.

@@ -118,16 +118,28 @@
             "id": "6b5b6056-5c4e-4bcc-b7f1-529d78b28802",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "Menu",
                     "type": "PassThrough",
-                    "id": "4c97d3fa-624c-40fb-a24a-72177e0f94a7",
+                    "id": "08a0ef1c-fa90-4816-b364-e0d2f653a8fe",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
                 }
             ],
-            "bindings": []
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1b92ff03-7fb5-49ec-8b27-cfabeec5dcaf",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

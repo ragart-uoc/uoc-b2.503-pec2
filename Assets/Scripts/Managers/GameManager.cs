@@ -12,9 +12,7 @@ namespace PEC2.Managers
         public int m_NumRoundsToWin = 5;            // The number of rounds a single player has to win to win the game
         public float m_StartDelay = 3f;             // The delay between the start of RoundStarting and RoundPlaying phases
         public float m_EndDelay = 3f;               // The delay between the end of RoundPlaying and RoundEnding phases
-        public CameraControl m_CameraControl;       // Reference to the CameraControl script for control during different phases
         public TextMeshProUGUI m_MessageText;                  // Reference to the overlay Text to display winning text, etc
-        public GameObject m_TankPrefab;             // Reference to the prefab the players will control
         public Tank[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks
 
         
@@ -31,45 +29,10 @@ namespace PEC2.Managers
             m_StartWait = new WaitForSeconds (m_StartDelay);
             m_EndWait = new WaitForSeconds (m_EndDelay);
 
-            //SpawnAllTanks();
-            SetCameraTargets();
-
             // Once the tanks have been created and the camera is using them as targets, start the game
-            StartCoroutine (GameLoop ());
+            StartCoroutine (GameLoop());
         }
-
-    /*
-        private void SpawnAllTanks()
-        {
-            // For all the tanks...
-            for (int i = 0; i < m_Tanks.Length; i++)
-            {
-                // ... create them, set their player number and references needed for control
-                m_Tanks[i].instance =
-                    Instantiate (m_TankPrefab, m_Tanks[i].spawnPoint.position, m_Tanks[i].spawnPoint.rotation) as GameObject;
-                m_Tanks[i].playerNumber = i + 1;
-                m_Tanks[i].Setup();
-            }
-        }
-    */
-
-        private void SetCameraTargets()
-        {
-            // Create a collection of transforms the same size as the number of tanks
-            Transform[] targets = new Transform[m_Tanks.Length];
-
-            // For each of these transforms...
-            for (int i = 0; i < targets.Length; i++)
-            {
-                // ... set it to the appropriate tank transform
-                targets[i] = m_Tanks[i].transform;
-            }
-
-            // These are the targets the camera should follow
-            m_CameraControl.m_Targets = targets;
-        }
-
-
+        
         // This is called from start and will run each phase of the game one after another
         private IEnumerator GameLoop()
         {
@@ -102,9 +65,6 @@ namespace PEC2.Managers
             // As soon as the round starts reset the tanks and make sure they can't move
             //ResetAllTanks();
             DisableTankControl();
-
-            // Snap the camera's zoom and position to something appropriate for the reset tanks
-            m_CameraControl.SetStartPositionAndSize();
 
             // Increment the round number and display text showing the players what round it is
             m_RoundNumber++;
@@ -246,16 +206,6 @@ namespace PEC2.Managers
 
             return message;
         }
-
-
-        // This function is used to turn all the tanks back on and reset their positions and properties
-        /*private void ResetAllTanks()
-        {
-            for (int i = 0; i < m_Tanks.Length; i++)
-            {
-                m_Tanks[i].Reset();
-            }
-        }*/
 
 
         private void EnableTankControl()

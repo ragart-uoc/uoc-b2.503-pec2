@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Mirror;
 
@@ -12,27 +11,21 @@ namespace PEC2.Entities
     {
         
         /// <value>Property <c>startingHealth</c> represents the amount of health each tank starts with.</value>
-        [FormerlySerializedAs("m_StartingHealth")]
         public float startingHealth = 100f;
 
         /// <value>Property <c>slider</c> represents the slider to represent how much health the tank currently has.</value>
-        [FormerlySerializedAs("m_Slider")]
         public Slider slider;
 
         /// <value>Property <c>fillImage</c> represents the image component of the slider.</value>
-        [FormerlySerializedAs("m_FillImage")]
         public Image fillImage;
 
         /// <value>Property <c>fullHealthColor</c> represents the color the health bar will be when on full health.</value>
-        [FormerlySerializedAs("m_FullHealthColor")]
         public Color fullHealthColor = Color.green;
 
         /// <value>Property <c>zeroHealthColor</c> represents the color the health bar will be when on no health.</value>
-        [FormerlySerializedAs("m_ZeroHealthColor")]
         public Color zeroHealthColor = Color.red;
 
         /// <value>Property <c>explosionPrefab</c> represents the prefab that will be used whenever the tank dies.</value>
-        [FormerlySerializedAs("m_ExplosionPrefab")]
         public GameObject explosionPrefab;
 
         /// <value>Property <c>m_ExplosionAudio</c> represents the audio source to play when the tank explodes.</value>
@@ -42,6 +35,7 @@ namespace PEC2.Entities
         private ParticleSystem m_ExplosionParticles;
 
         /// <value>Property <c>m_CurrentHealth</c> represents how much health the tank currently has.</value>
+        [SyncVar(hook = "SetHealthUI")]
         private float m_CurrentHealth;
 
         /// <value>Property <c>m_Dead</c> represents whether or not the tank is currently dead.</value>
@@ -70,21 +64,16 @@ namespace PEC2.Entities
             // When the tank is enabled, reset the tank's health and whether or not it's dead.
             m_CurrentHealth = startingHealth;
             m_Dead = false;
-
-            // Update the health slider's value and color
-            SetHealthUI();
         }
 
         /// <summary>
         /// Method <c>TakeDamage</c> is used to inflict damage upon the tank.
         /// </summary>
+        /// <param name="amount">The amount of damage to inflict.</param>
         public void TakeDamage(float amount)
         {
             // Reduce current health by the amount of damage done
             m_CurrentHealth -= amount;
-
-            // Change the UI elements appropriately
-            SetHealthUI();
 
             // If the current health is at or below zero and it has not yet been registered, call OnDeath
             if (m_CurrentHealth <= 0f && !m_Dead)
@@ -96,13 +85,15 @@ namespace PEC2.Entities
         /// <summary>
         /// Method <c>SetHealthUI</c> is used to update the health slider's value and color.
         /// </summary>
-        private void SetHealthUI()
+        /// <param name="oldHealth">The previous health value.</param>
+        /// <param name="newHealth">The new health value.</param>
+        private void SetHealthUI(float oldHealth, float newHealth)
         {
             // Set the slider's value appropriately.
-            slider.value = m_CurrentHealth;
+            slider.value = newHealth;
 
             // Interpolate the color of the bar between the choosen colours based on the current percentage of the starting health.
-            fillImage.color = Color.Lerp(zeroHealthColor, fullHealthColor, m_CurrentHealth / startingHealth);
+            fillImage.color = Color.Lerp(zeroHealthColor, fullHealthColor, newHealth / startingHealth);
         }
 
         /// <summary>
