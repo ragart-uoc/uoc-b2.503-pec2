@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Mirror.Discovery;
+using UnityEngine.UI;
 
 namespace PEC2
 {
@@ -11,6 +12,9 @@ namespace PEC2
         readonly Dictionary<long, ServerResponse> discoveredServers = new Dictionary<long, ServerResponse>();
         Vector2 scrollViewPos = Vector2.zero;
         public NetworkDiscovery networkDiscovery;
+
+        // Listado de partidas encontradas
+        private List<PartidaEncontrada> PartidasEncontradas;
 
         // Para jugar en LAN, especificar IP del servidor
         public string serverIP = "localhost";
@@ -27,15 +31,7 @@ namespace PEC2
 
         public GameObject PartidaEncontradaPrefab;
 
-        private void Update() {
-            if(NetworkManager.singleton != null && !NetworkClient.isConnected && !NetworkServer.active && !NetworkClient.active){
-                int i = 0;
-                foreach (KeyValuePair<long, Mirror.Discovery.ServerResponse> entry in discoveredServers)
-                {
-                    GameObject a = Instantiate(PartidaEncontradaPrefab, new Vector3(0, i++, 0), new Quaternion(), PanelPartidas.transform);
-                }
-            }
-        }
+        public GameObject ActualizaServidoresButton;
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -57,22 +53,73 @@ namespace PEC2
         public void ModoJugadorAction(){
             BotonesInicio.SetActive(false);
             PanelJugador.SetActive(true);
+            
+            // Comienza Network Discovery
+            Debug.Log("Actualizando servidores...");
+            discoveredServers.Clear();
+            networkDiscovery.StartDiscovery();
+            PartidasEncontradas = new List<PartidaEncontrada>();
         }
 
         public void CrearServidorDedicadoAction(){
             if (!NetworkClient.isConnected && !NetworkServer.active) {
                 if (!NetworkClient.active) {
+                    discoveredServers.Clear();
                     NetworkManager.singleton.StartServer();
+                    networkDiscovery.AdvertiseServer();
                 }
             }
+        }
+
+        public void ActualizaServidoresAction(){
+            // Borramos la lista antigua
+            if(PartidasEncontradas.Count > 0){
+                foreach(PartidaEncontrada partidaEncontrada in PartidasEncontradas){
+                    Destroy(partidaEncontrada.banner);
+                }
+                PartidasEncontradas.Clear();
+            }
+
+            // Generamos la lista nueva
+            int i = 0;
+            foreach (ServerResponse info in discoveredServers.Values)
+            {
+                PartidaEncontrada partidaEncontrada = new PartidaEncontrada();
+                partidaEncontrada.banner = Instantiate(PartidaEncontradaPrefab);
+                partidaEncontrada.banner.transform.SetParent(PanelPartidas.transform, false);
+                RectTransform rectTransform = partidaEncontrada.banner.GetComponent<RectTransform>();
+                rectTransform.Translate(0, -60*i, 0);
+                partidaEncontrada.address = info;
+
+                Button button = partidaEncontrada.banner.GetComponentInChildren<Button>();
+                button.onClick.AddListener(delegate {JoinServer(partidaEncontrada.address);});
+
+                TMPro.TextMeshProUGUI texto = partidaEncontrada.banner.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                texto.SetText(partidaEncontrada.address.EndPoint.Address.ToString());
+
+                PartidasEncontradas.Add(partidaEncontrada);
+                i++;
+            }
+            Debug.Log(" -> " + i + " servidores encontrados!");
+        }
+
+        private void JoinServer(ServerResponse info){
+            networkDiscovery.StopDiscovery();
+            NetworkManager.singleton.StartClient(info.uri);
+        }
+
+        public class PartidaEncontrada{
+            public ServerResponse address{get; set;}
+            public GameObject banner{get; set;}
         }
 
         public void CrearPartida(){
             Debug.Log(" -> Crear partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
-                    Debug.Log(" Cliente desconectado + servidor inactivo + cliente inactivo...");
+                    discoveredServers.Clear();
                     NetworkManager.singleton.StartHost();
+                    networkDiscovery.AdvertiseServer();
                 }
             }
         }
