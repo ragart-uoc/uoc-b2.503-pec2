@@ -1,8 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using Mirror;
-using Cinemachine;
 using TMPro;
+using PEC2.Managers;
 
 namespace PEC2.Entities
 {
@@ -42,8 +42,8 @@ namespace PEC2.Entities
         /// <value>Property <c>m_CanvasGameObject</c> is used to disable the world space UI during the Starting and Ending phases of each round.</value>
         private GameObject m_CanvasGameObject;
 
-        /// <value>Property <c>m_CinemachineTargetGroup</c> is used to add the tank to the CinemachineTargetGroup.</value>
-        private CinemachineTargetGroup m_CinemachineTargetGroup;
+        /// <value>Property <c>m_CameraManager</c> is used to add the tank to the group camera.</value>
+        private CameraManager m_CameraManager;
 
         /// <summary>
         /// Method <c>Start</c> is called on the frame when a script is enabled just before any of the Update methods are called the first time.
@@ -55,6 +55,7 @@ namespace PEC2.Entities
             m_Shooting = GetComponent<TankShooting>();
             m_Health = GetComponent<TankHealth>();
             m_CanvasGameObject = GetComponentInChildren<Canvas>().gameObject;
+            m_CameraManager = GameObject.Find("CameraManager").GetComponent<CameraManager>();
             
             // Get player name from PlayerPrefs
             var newPlayerName = PlayerPrefs.GetString("PlayerName", "Player " + netId);
@@ -70,8 +71,7 @@ namespace PEC2.Entities
             SetColor(newPlayerColor);
 
             // Add to cinemachine target group
-            m_CinemachineTargetGroup = FindObjectOfType<CinemachineTargetGroup>();
-            m_CinemachineTargetGroup.AddMember(transform, 1, 1);
+            m_CameraManager.AddPlayer(gameObject);
         }
         
         /// <summary>

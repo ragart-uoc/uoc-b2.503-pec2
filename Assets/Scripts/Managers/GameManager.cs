@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using PEC2.Cameras;
 using PEC2.Entities;
 
 namespace PEC2.Managers

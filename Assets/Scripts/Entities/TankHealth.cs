@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using PEC2.Managers;
 
 namespace PEC2.Entities
 {
@@ -40,6 +41,9 @@ namespace PEC2.Entities
         /// <value>Property <c>m_Dead</c> represents whether or not the tank is currently dead.</value>
         private bool m_Dead;
 
+        /// <value>Property <c>m_CameraManager</c> is used to add the tank to the group camera.</value>
+        private CameraManager m_CameraManager;
+
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
         /// </summary>
@@ -61,6 +65,9 @@ namespace PEC2.Entities
         private void Start()
         {
             currentHealth = StartingHealth;
+            
+            // Get a reference to the camera manager
+            m_CameraManager = GameObject.Find("CameraManager").GetComponent<CameraManager>();
         }
 
         /// <summary>
@@ -113,6 +120,9 @@ namespace PEC2.Entities
 
             // Play the tank explosion sound effect
             m_ExplosionAudio.Play();
+            
+            // Remove the tank from the camera manager
+            m_CameraManager.RemovePlayer(gameObject);
 
             // Turn the tank off
             //gameObject.SetActive(false);
