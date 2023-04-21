@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using PEC2.Cameras;
+using PEC2.Entities;
 
 namespace PEC2.Managers
 {
@@ -11,17 +11,15 @@ namespace PEC2.Managers
         public int m_NumRoundsToWin = 5;            // The number of rounds a single player has to win to win the game
         public float m_StartDelay = 3f;             // The delay between the start of RoundStarting and RoundPlaying phases
         public float m_EndDelay = 3f;               // The delay between the end of RoundPlaying and RoundEnding phases
-        public CameraControl m_CameraControl;       // Reference to the CameraControl script for control during different phases
         public TextMeshProUGUI m_MessageText;                  // Reference to the overlay Text to display winning text, etc
-        public GameObject m_TankPrefab;             // Reference to the prefab the players will control
-        public TankManager[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks
+        public Tank[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks
 
         
         private int m_RoundNumber;                  // Which round the game is currently on
         private WaitForSeconds m_StartWait;         // Used to have a delay whilst the round starts
         private WaitForSeconds m_EndWait;           // Used to have a delay whilst the round or game ends
-        private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won
-        private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won
+        private Tank m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won
+        private Tank m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won
 
 
         private void Start()
@@ -30,45 +28,10 @@ namespace PEC2.Managers
             m_StartWait = new WaitForSeconds (m_StartDelay);
             m_EndWait = new WaitForSeconds (m_EndDelay);
 
-            SpawnAllTanks();
-            SetCameraTargets();
-
             // Once the tanks have been created and the camera is using them as targets, start the game
-            StartCoroutine (GameLoop ());
+            StartCoroutine (GameLoop());
         }
-
-
-        private void SpawnAllTanks()
-        {
-            // For all the tanks...
-            for (int i = 0; i < m_Tanks.Length; i++)
-            {
-                // ... create them, set their player number and references needed for control
-                m_Tanks[i].m_Instance =
-                    Instantiate (m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
-                m_Tanks[i].m_PlayerNumber = i + 1;
-                m_Tanks[i].Setup();
-            }
-        }
-
-
-        private void SetCameraTargets()
-        {
-            // Create a collection of transforms the same size as the number of tanks
-            Transform[] targets = new Transform[m_Tanks.Length];
-
-            // For each of these transforms...
-            for (int i = 0; i < targets.Length; i++)
-            {
-                // ... set it to the appropriate tank transform
-                targets[i] = m_Tanks[i].m_Instance.transform;
-            }
-
-            // These are the targets the camera should follow
-            m_CameraControl.m_Targets = targets;
-        }
-
-
+        
         // This is called from start and will run each phase of the game one after another
         private IEnumerator GameLoop()
         {
@@ -99,11 +62,8 @@ namespace PEC2.Managers
         private IEnumerator RoundStarting()
         {
             // As soon as the round starts reset the tanks and make sure they can't move
-            ResetAllTanks();
+            //ResetAllTanks();
             DisableTankControl();
-
-            // Snap the camera's zoom and position to something appropriate for the reset tanks
-            m_CameraControl.SetStartPositionAndSize();
 
             // Increment the round number and display text showing the players what round it is
             m_RoundNumber++;
@@ -145,7 +105,7 @@ namespace PEC2.Managers
             // If there is a winner, increment their score
             if (m_RoundWinner != null)
             {
-                m_RoundWinner.m_Wins++;
+                m_RoundWinner.wins++;
             }
 
             // Now the winner's score has been incremented, see if someone has one the game
@@ -185,13 +145,13 @@ namespace PEC2.Managers
         
         // This function is to find out if there is a winner of the round
         // This function is called with the assumption that 1 or fewer tanks are currently active
-        private TankManager GetRoundWinner()
+        private Tank GetRoundWinner()
         {
             // Go through all the tanks...
             for (int i = 0; i < m_Tanks.Length; i++)
             {
                 // ... and if one of them is active, it is the winner so return it
-                if (m_Tanks[i].m_Instance.activeSelf)
+                if (m_Tanks[i].isActiveAndEnabled)
                 {
                     return m_Tanks[i];
                 }
@@ -203,13 +163,13 @@ namespace PEC2.Managers
 
 
         // This function is to find out if there is a winner of the game
-        private TankManager GetGameWinner()
+        private Tank GetGameWinner()
         {
             // Go through all the tanks...
             for (int i = 0; i < m_Tanks.Length; i++)
             {
                 // ... and if one of them has enough rounds to win the game, return it
-                if (m_Tanks[i].m_Wins == m_NumRoundsToWin)
+                if (m_Tanks[i].wins == m_NumRoundsToWin)
                 {
                     return m_Tanks[i];
                 }
@@ -228,7 +188,7 @@ namespace PEC2.Managers
 
             // If there is a winner then change the message to reflect that
             if (m_RoundWinner != null)
-                message = m_RoundWinner.m_ColoredPlayerText + " WINS THE ROUND!";
+                message = m_RoundWinner.coloredPlayerText + " WINS THE ROUND!";
 
             // Add some line breaks after the initial message
             message += "\n\n\n\n";
@@ -236,24 +196,14 @@ namespace PEC2.Managers
             // Go through all the tanks and add each of their scores to the message
             for (int i = 0; i < m_Tanks.Length; i++)
             {
-                message += m_Tanks[i].m_ColoredPlayerText + ": " + m_Tanks[i].m_Wins + " WINS\n";
+                message += m_Tanks[i].coloredPlayerText + ": " + m_Tanks[i].wins + " WINS\n";
             }
 
             // If there is a game winner, change the entire message to reflect that
             if (m_GameWinner != null)
-                message = m_GameWinner.m_ColoredPlayerText + " WINS THE GAME!";
+                message = m_GameWinner.coloredPlayerText + " WINS THE GAME!";
 
             return message;
-        }
-
-
-        // This function is used to turn all the tanks back on and reset their positions and properties
-        private void ResetAllTanks()
-        {
-            for (int i = 0; i < m_Tanks.Length; i++)
-            {
-                m_Tanks[i].Reset();
-            }
         }
 
 

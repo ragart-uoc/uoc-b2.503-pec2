@@ -6,31 +6,89 @@
             "id": "50a11bb3-fd21-4899-92bd-7996510ca8aa",
             "actions": [
                 {
+                    "name": "Move",
+                    "type": "PassThrough",
+                    "id": "d894d81d-a619-4297-a0db-eb412c9fcaa4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Fire",
                     "type": "Button",
                     "id": "5d50249a-3b1a-48f9-809e-b5cae999d48d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 },
                 {
-                    "name": "MoveTank",
-                    "type": "PassThrough",
-                    "id": "d894d81d-a619-4297-a0db-eb412c9fcaa4",
-                    "expectedControlType": "",
+                    "name": "AltFire",
+                    "type": "Button",
+                    "id": "f527f58a-b57b-456f-b1b2-06480d2081bd",
+                    "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "TurnTank",
-                    "type": "PassThrough",
-                    "id": "7a79f75b-47f1-443b-8ef9-9eb3f7a8711a",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": ""
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
+                {
+                    "name": "Arrows",
+                    "id": "0f3cb15d-ca1c-4c3b-86b6-140a76162cc9",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Up",
+                    "id": "3e59c60b-5b34-4ff9-9511-dc54636461a6",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Down",
+                    "id": "64f7b9e1-1c59-4be4-aced-7c9768d5ae0d",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Left",
+                    "id": "afe635c0-02bb-4191-b15a-f3595d4ce7a2",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Right",
+                    "id": "7e6ead82-83de-4059-9d51-a9792e1be500",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
                 {
                     "name": "",
                     "id": "c58cdd4f-cead-4778-9ce1-33609a38022b",
@@ -43,70 +101,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Vertical Axis",
-                    "id": "0f3cb15d-ca1c-4c3b-86b6-140a76162cc9",
-                    "path": "2DVector",
+                    "name": "",
+                    "id": "7da6c0b9-030a-4c32-9ef1-3eaa56d02f39",
+                    "path": "<Keyboard>/ctrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveTank",
-                    "isComposite": true,
+                    "action": "AltFire",
+                    "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "Up",
-                    "id": "3e59c60b-5b34-4ff9-9511-dc54636461a6",
-                    "path": "<Keyboard>/upArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "MoveTank",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Down",
-                    "id": "64f7b9e1-1c59-4be4-aced-7c9768d5ae0d",
-                    "path": "<Keyboard>/downArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "MoveTank",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Horizontal Axis",
-                    "id": "7f125e76-842e-41be-b4d9-1b430a570c9a",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "TurnTank",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Left",
-                    "id": "afe635c0-02bb-4191-b15a-f3595d4ce7a2",
-                    "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "TurnTank",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Right",
-                    "id": "7e6ead82-83de-4059-9d51-a9792e1be500",
-                    "path": "<Keyboard>/rightArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "TurnTank",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 }
             ]
         },
@@ -115,15 +118,28 @@
             "id": "6b5b6056-5c4e-4bcc-b7f1-529d78b28802",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "Menu",
                     "type": "PassThrough",
-                    "id": "4c97d3fa-624c-40fb-a24a-72177e0f94a7",
+                    "id": "08a0ef1c-fa90-4816-b364-e0d2f653a8fe",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press"
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
-            "bindings": []
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1b92ff03-7fb5-49ec-8b27-cfabeec5dcaf",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
