@@ -10620,16 +10620,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edb8cdb8b19a50648b1ef1fb26a74db4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 1
+  syncDirection: 0
   syncMode: 0
-  syncInterval: 0
+  syncInterval: 0.01
   playerName: 
   playerNameText: {fileID: 306689910405375950}
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   coloredPlayerText: 
   wins: 0
-  playerInfoPrefab: {fileID: 1149367535550888100, guid: 2d1d73be3758cdb47a9d5d2eb82d1f4e,
-    type: 3}
 --- !u!114 &11443146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10665,8 +10663,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
-  syncInterval: 0
-  startingHealth: 100
+  syncInterval: 0.01
+  currentHealth: 0
   slider: {fileID: 11482748}
   fillImage: {fileID: 11404512}
   fullHealthColor: {r: 0, g: 1, b: 0, a: 1}

@@ -13,14 +13,14 @@ namespace PEC2.Entities
     public class Tank : NetworkBehaviour
     {
         /// <value>Property <c>playerName</c> represents the name of the player.</value>
-        [SyncVar(hook = "ChangeName")]
+        [SyncVar(hook = "OnChangeName")]
         public string playerName;
         
         /// <value>Property <c>playerNameText</c> represents the text component of the player name.</value>
         public TextMeshProUGUI playerNameText;
-
+        
         /// <value>Property <c>playerColor</c> represents the color of the player tank.</value>
-        [SyncVar(hook = "ChangeColor")]
+        [SyncVar(hook = "OnChangeColor")]
         public Color playerColor;
 
         /// <value>Property <c>coloredPlayerText</c> represents the player with their number colored to match their tank.</value>
@@ -28,7 +28,6 @@ namespace PEC2.Entities
         public string coloredPlayerText;
 
         /// <value>Property <c>wins</c> represents the number of wins this player has so far.</value>
-        [SyncVar]
         public int wins;
 
         /// <value>Property <c>m_Movement</c> represents the tank's movement script, used to disable and enable control.</value>
@@ -56,23 +55,19 @@ namespace PEC2.Entities
             m_Shooting = GetComponent<TankShooting>();
             m_Health = GetComponent<TankHealth>();
             m_CanvasGameObject = GetComponentInChildren<Canvas>().gameObject;
-        }
-
-        /// <summary>
-        /// Method <c>OnStartLocalPlayer</c> is called when the local player object has been set up.
-        /// </summary>
-        public override void OnStartLocalPlayer()
-        {
+            
             // Get player name from PlayerPrefs
-            playerName = PlayerPrefs.GetString("PlayerName", "Player " + GetComponent<NetworkIdentity>().netId);
+            var newPlayerName = PlayerPrefs.GetString("PlayerName", "Player " + netId);
+            SetName(newPlayerName);
                 
             // Get player color from PlayerPrefs
             var playerColorString = PlayerPrefs.GetString("PlayerColor", "");
 
             // Convert string to color
-            playerColor = playerColorString.Split(',').Length == 3
+            var newPlayerColor = playerColorString.Split(',').Length == 3
                 ? ColorFromString(playerColorString)
                 : Color.blue;
+            SetColor(newPlayerColor);
 
             // Add to cinemachine target group
             m_CinemachineTargetGroup = FindObjectOfType<CinemachineTargetGroup>();
@@ -104,22 +99,58 @@ namespace PEC2.Entities
         }
 
         /// <summary>
-        /// Method <c>ChangeName</c> is used to change the name of the tank.
+        /// Method <c>SetName</c> is used to set the name of the tank.
         /// </summary>
-        /// <param name="oldName">The old name of the tank.</param>
-        /// <param name="newName">The new name of the tank.</param>
-        private void ChangeName(string oldName, string newName)
+        public void SetName(string newName)
+        {
+            if (!isLocalPlayer)
+                return;
+            CmdSetName(newName);
+        }
+        
+        [Command]
+        public void CmdSetName(string newName)
+        {
+            playerName = newName;
+            RpcUpdateName(newName);
+        }
+        
+        [ClientRpc]
+        public void RpcUpdateName(string newName)
+        {
+            OnChangeName(playerName, newName);
+        }
+        
+        public void OnChangeName(string oldName, string newName)
         {
             // Change the name of the player
             playerNameText.text = newName;
         }
         
         /// <summary>
-        /// Method <c>ChangeColor</c> is used to change the color of the tank.
+        /// Method <c>SetColor</c> is used to set the color of the tank.
         /// </summary>
-        /// <param name="oldColor">The old color of the tank.</param>
-        /// <param name="newColor">The new color of the tank.</param>
-        private void ChangeColor(Color oldColor, Color newColor)
+        public void SetColor(Color newColor)
+        {
+            if (!isLocalPlayer)
+                return;
+            CmdSetColor(newColor);
+        }
+        
+        [Command]
+        public void CmdSetColor(Color newColor)
+        {
+            playerColor = newColor;
+            RpcUpdateColor(newColor);
+        }
+        
+        [ClientRpc]
+        public void RpcUpdateColor(Color newColor)
+        {
+            OnChangeColor(playerColor, newColor);
+        }
+        
+        public void OnChangeColor(Color oldColor, Color newColor)
         {
             // Get all of the renderers of the tank
             var renderers = GetComponentsInChildren<MeshRenderer>();
@@ -134,7 +165,7 @@ namespace PEC2.Entities
             // Change the color of the player name
             playerNameText.color = newColor;
         }
-        
+
         /// <summary>
         /// Method <c>ColorToString</c> is used to convert a color to a string.
         /// </summary>

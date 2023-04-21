@@ -8,7 +8,7 @@ using PEC2.Entities;
 
 namespace PEC2.Managers
 {
-    public class UIManager : NetworkBehaviour
+    public class UIManager : MonoBehaviour
     {
         /// <value>Property <c>_instance</c> represents the singleton instance of the class.</value>
         private static UIManager _instance;
@@ -36,7 +36,7 @@ namespace PEC2.Managers
         /// </summary>
         private void OnMenu(InputValue inputValue)
         {
-            if (!NetworkServer.active || !NetworkClient.isConnected)
+            if (!NetworkClient.isConnected)
                 return;
             ToggleMenu();
         }
@@ -44,12 +44,12 @@ namespace PEC2.Managers
         /// <summary>
         /// Method <c>ChangePlayerName</c> is used to change the player name.
         /// </summary>
-        /// <param name="playerName">The new player name.</param>
-        public void ChangePlayerName(string playerName)
+        /// <param name="newName">The new player name.</param>
+        public void ChangePlayerName(string newName)
         {
-            if (!NetworkServer.active || !NetworkClient.isConnected)
+            if (!NetworkClient.isConnected)
                 return;
-            NetworkClient.localPlayer.GetComponent<Tank>().playerName = playerName;
+            NetworkClient.localPlayer.GetComponent<Tank>().SetName(newName);
         }
         
         /// <summary>
@@ -58,11 +58,11 @@ namespace PEC2.Managers
         /// <param name="dropdown">The dropdown menu.</param>
         public void ChangePlayerColor(TMP_Dropdown dropdown)
         {
-            if (!NetworkServer.active || !NetworkClient.isConnected)
+            if (!NetworkClient.isConnected)
                 return;
             var color = dropdown.options[dropdown.value].text;
             if (ColorUtility.TryParseHtmlString(color, out var newColor))
-                NetworkClient.localPlayer.GetComponent<Tank>().playerColor = newColor;
+                NetworkClient.localPlayer.GetComponent<Tank>().SetColor(newColor);
         }
 
         /// <summary>

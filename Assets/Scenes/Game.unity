@@ -998,7 +998,7 @@ MonoBehaviour:
   offlineScene: 
   onlineScene: 
   transport: {fileID: 384316174}
-  networkAddress: localhost
+  networkAddress: 192.168.1.145
   maxConnections: 100
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 173472, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
@@ -2814,7 +2814,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1205865282
 RectTransform:
   m_ObjectHideFlags: 0
