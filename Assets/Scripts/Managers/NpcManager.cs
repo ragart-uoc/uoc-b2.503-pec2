@@ -29,7 +29,7 @@ namespace PEC2.Managers
             // Singleton pattern
             if (_instance != null && _instance != this)
             {
-                Destroy(this.gameObject);
+                Destroy(gameObject);
                 return;
             }
 
@@ -54,8 +54,8 @@ namespace PEC2.Managers
                 var enemy = Instantiate(enemyPrefab, spawnPosition, spawnRotation);
                 NetworkServer.Spawn(enemy);
                 
-                // Add the enemy to the group camera
-                cameraManager.AddPlayer(enemy);
+                // Refresh the group camera targets
+                cameraManager.UpdateTargetGroup();
             }
         }
     }

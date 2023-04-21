@@ -69,9 +69,9 @@ namespace PEC2.Entities
                 ? ColorFromString(playerColorString)
                 : Color.blue;
             SetColor(newPlayerColor);
-
-            // Add to cinemachine target group
-            m_CameraManager.AddPlayer(gameObject);
+                
+            // Refresh the group camera targets
+            m_CameraManager.UpdateTargetGroup();
         }
         
         /// <summary>
@@ -101,6 +101,7 @@ namespace PEC2.Entities
         /// <summary>
         /// Method <c>SetName</c> is used to set the name of the tank.
         /// </summary>
+        /// <param name="newName">The new name of the tank.</param>
         public void SetName(string newName)
         {
             if (!isLocalPlayer)
@@ -108,6 +109,10 @@ namespace PEC2.Entities
             CmdSetName(newName);
         }
         
+        /// <summary>
+        /// Command <c>CmdSetName</c> is used to set the name of the tank.
+        /// </summary>
+        /// <param name="newName">The new name of the tank.</param>
         [Command]
         public void CmdSetName(string newName)
         {
@@ -115,12 +120,20 @@ namespace PEC2.Entities
             RpcUpdateName(newName);
         }
         
+        /// <summary>
+        /// Method <c>RpcUpdateName</c> is used to update the name of the tank.
+        /// </summary>
         [ClientRpc]
         public void RpcUpdateName(string newName)
         {
             OnChangeName(playerName, newName);
         }
         
+        /// <summary>
+        /// Method <c>OnChangeName</c> is used to update the name of the tank.
+        /// </summary>
+        /// <param name="oldName">The old name of the tank.</param>
+        /// <param name="newName">The new name of the tank.</param>
         public void OnChangeName(string oldName, string newName)
         {
             // Change the name of the player
@@ -130,6 +143,7 @@ namespace PEC2.Entities
         /// <summary>
         /// Method <c>SetColor</c> is used to set the color of the tank.
         /// </summary>
+        /// <param name="newColor">The new color of the tank.</param>
         public void SetColor(Color newColor)
         {
             if (!isLocalPlayer)
@@ -137,6 +151,10 @@ namespace PEC2.Entities
             CmdSetColor(newColor);
         }
         
+        /// <summary>
+        /// Command <c>CmdSetColor</c> is used to set the color of the tank.
+        /// </summary>
+        /// <param name="newColor">The new color of the tank.</param>
         [Command]
         public void CmdSetColor(Color newColor)
         {
@@ -144,12 +162,20 @@ namespace PEC2.Entities
             RpcUpdateColor(newColor);
         }
         
+        /// <summary>
+        /// Method <c>RpcUpdateColor</c> is used to update the color of the tank.
+        /// </summary>
         [ClientRpc]
         public void RpcUpdateColor(Color newColor)
         {
             OnChangeColor(playerColor, newColor);
         }
         
+        /// <summary>
+        /// Method <c>OnChangeColor</c> is used to update the color of the tank.
+        /// </summary>
+        /// <param name="oldColor">The old color of the tank.</param>
+        /// <param name="newColor">The new color of the tank.</param>
         public void OnChangeColor(Color oldColor, Color newColor)
         {
             // Get all of the renderers of the tank

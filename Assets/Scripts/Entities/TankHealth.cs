@@ -40,6 +40,9 @@ namespace PEC2.Entities
 
         /// <value>Property <c>m_Dead</c> represents whether or not the tank is currently dead.</value>
         private bool m_Dead;
+        
+        /// <value>Property <c>destroyOnDeath</c> represents whether or not the tank should be destroyed when it dies.</value>
+        public bool destroyOnDeath;
 
         /// <value>Property <c>m_CameraManager</c> is used to add the tank to the group camera.</value>
         private CameraManager m_CameraManager;
@@ -86,6 +89,8 @@ namespace PEC2.Entities
             if (currentHealth <= 0f && !m_Dead)
             {
                 OnDeath();
+                Destroy(gameObject);
+                Destroy(m_ExplosionParticles.gameObject);
             }
         }
 
@@ -120,13 +125,9 @@ namespace PEC2.Entities
 
             // Play the tank explosion sound effect
             m_ExplosionAudio.Play();
-            
-            // Remove the tank from the camera manager
-            m_CameraManager.RemovePlayer(gameObject);
-
-            // Turn the tank off
-            //gameObject.SetActive(false);
-            Destroy(gameObject);
+                
+            // Refresh the group camera targets
+            m_CameraManager.UpdateTargetGroup();
         }
     }
 }

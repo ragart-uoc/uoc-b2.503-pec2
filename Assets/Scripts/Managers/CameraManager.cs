@@ -1,22 +1,21 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Cinemachine;
+using Mirror;
+using Mirror.SimpleWeb;
 
 namespace PEC2.Managers
 {
     /// <summary>
     /// Class <c>GameManager</c> controls the flow of the game.
     /// </summary>
-    public class CameraManager : MonoBehaviour
+    public class CameraManager : NetworkBehaviour
     {
         /// <value>Property <c>_instance</c> represents the singleton instance of the class.</value>
         private static CameraManager _instance;
 
         /// <value>Property <c>m_GroupTargetCamera</c> is a reference to the group camera CinemachineTargetGroup component.</value>
         public CinemachineTargetGroup groupTargetCamera;
-        
-        /// <value>Property <c>m_Players</c> is a list of all players in the scene.</value>
-        private List<GameObject> m_Players = new List<GameObject>();
 
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
@@ -26,39 +25,76 @@ namespace PEC2.Managers
             // Singleton pattern
             if (_instance != null && _instance != this)
             {
-                Destroy(this.gameObject);
+                Destroy(gameObject);
                 return;
             }
 
             _instance = this;
         }
         
-        public void AddPlayer(GameObject player)
+        /// <summary>
+        /// Method <c>OnStartServer</c> is invoked for NetworkBehaviour objects when they become active on the server.
+        /// </summary>
+        public override void OnStartServer()
         {
-            m_Players.Add(player);
-            RefreshGroupCamera();
+            UpdateTargetGroup();
         }
         
-        public void RemovePlayer(GameObject player)
+        /// <summary>
+        /// Method <c>OnStartClient</c> is invoked for NetworkBehaviour objects when they become active on the client.
+        /// </summary>
+        public override void OnStartClient()
         {
-            m_Players.Remove(player);
-            RefreshGroupCamera();
+            UpdateTargetGroup();
         }
 
-        private void RefreshGroupCamera()
+        /// <summary>
+        /// Method <c>UpdateTargetGroup</c> updates the group camera targets.
+        /// </summary>
+        public void UpdateTargetGroup()
         {
-            // Add all players to the group camera
-            foreach (var player in m_Players)
-            {
-                AddTargetToGroupCamera(player);
-            }
+            if (isServer)
+                RpcUpdateTargetGroup();
+            else if (isLocalPlayer)
+                CmdUpdateTargetGroup();
+                
+        }
+        
+        /// <summary>
+        /// Command <c>CmdUpdateTargetGroup</c> updates the group camera targets.
+        /// </summary>
+        [Command]
+        public void CmdUpdateTargetGroup()
+        {
+            RpcUpdateTargetGroup();
+        }
 
-            // Remove all targets that are not in the list
-            var members = groupTargetCamera.m_Targets;
-            foreach (var member in members)
+        /// <summary>
+        /// Method <c>RpcUpdateTargetGroup</c> updates the group camera targets.
+        /// </summary>
+        [ClientRpc]
+        public void RpcUpdateTargetGroup()
+        {
+            OnChangeTargetGroup();
+        }
+        
+        /// <summary>
+        /// Method <c>OnChangeTargetGroup</c> is called when the group camera targets change.
+        /// </summary>
+        private void OnChangeTargetGroup()
+        {
+            // Clear all targets from the group camera
+            groupTargetCamera.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
+            
+            // Loop through all spawned entities
+            foreach (var entity in NetworkClient.spawned.Values)
             {
-                if (!m_Players.Contains(member.target.gameObject))
-                    RemoveTargetFromGroupCamera(member.target.gameObject);
+                // Check if the entity has either the player or the enemy tag
+                if (entity.CompareTag("Player") || entity.CompareTag("Enemy"))
+                {
+                    // Add the entity to the group camera
+                    AddTargetToGroupCamera(entity.gameObject);
+                }
             }
         }
         
@@ -71,17 +107,6 @@ namespace PEC2.Managers
             if (groupTargetCamera.FindMember(target.transform) > -1)
                 return;
             groupTargetCamera.AddMember(target.transform, 1, 5);
-        }
-        
-        /// <summary>
-        /// Method <c>RemoveTargetFromGroupCamera</c> removes a target from the group camera.
-        /// </summary>
-        /// <param name="target">The target to remove.</param>
-        private void RemoveTargetFromGroupCamera(GameObject target)
-        {
-            if (groupTargetCamera.FindMember(target.transform) == -1)
-                return;
-            groupTargetCamera.RemoveMember(target.transform);
         }
     }
 }

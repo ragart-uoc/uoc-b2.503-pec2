@@ -1475,7 +1475,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57bca2c2e2094874892a854248ef4e27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.01
   groupTargetCamera: {fileID: 647053167}
+  players: []
 --- !u!114 &634403892
 MonoBehaviour:
   m_ObjectHideFlags: 0
