@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using Mirror;
 
 namespace PEC2.Entities
@@ -12,27 +11,21 @@ namespace PEC2.Entities
     {
 
         /// <value>Property <c>speed</c> represents how fast the tank moves forward and back.</value>
-        [FormerlySerializedAs("m_Speed")]
         public float speed = 12f;
 
         /// <value>Property <c>turnSpeed</c> represents how fast the tank turns in degrees per second.</value>
-        [FormerlySerializedAs("m_TurnSpeed")]
         public float turnSpeed = 180f;
 
         /// <value>Property <c>movementAudio</c> is a reference to the audio source used to play engine sounds.</value>
-        [FormerlySerializedAs("m_MovementAudio")]
         public AudioSource movementAudio;
 
         /// <value>Property <c>engineIdling</c> represents the audio to play when the tank isn't moving.</value>
-        [FormerlySerializedAs("m_EngineIdling")]
         public AudioClip engineIdling;
 
         /// <value>Property <c>engineDriving</c> represents the audio to play when the tank is moving.</value>
-        [FormerlySerializedAs("m_EngineDriving")]
         public AudioClip engineDriving;
 
         /// <value>Property <c>pitchRange</c> represents the amount by which the pitch of the engine noises can vary.</value>
-        [FormerlySerializedAs("m_PitchRange")]
         public float pitchRange = 0.2f;
 
         /// <value>Property <c>m_Rigidbody</c> represents the rigidbody component of the tank.</value>
@@ -72,6 +65,10 @@ namespace PEC2.Entities
             // Also reset the input values
             m_MovementInputValue = 0f;
             m_TurnInputValue = 0f;
+            
+            // And the velocity
+            m_Rigidbody.velocity = Vector3.zero;
+            m_Rigidbody.angularVelocity = Vector3.zero;
 
             // We grab all the Particle systems child of that Tank to be able to Stop/Play them on Deactivate/Activate
             // It is needed because we move the Tank when spawning it, and if the Particle System is playing while we do that

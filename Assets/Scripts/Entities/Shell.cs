@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using Mirror;
 
 namespace PEC2.Entities
@@ -10,11 +9,9 @@ namespace PEC2.Entities
     public class Shell : NetworkBehaviour
     {
         /// <value>Property <c>tankMask</c> represents the layer mask of the tanks. It's used to filter what the explosion affects It should be set to "Players".</value>
-        [FormerlySerializedAs("m_TankMask")]
         public LayerMask tankMask;
 
         /// <value>Property <c>explosionParticles</c> represents the particles that will play on explosion.</value>
-        [FormerlySerializedAs("m_ExplosionParticles")]
         public ParticleSystem explosionParticles;
 
         /// <value>Property <c>audioSOurce</c> represents the audio source.</value>
@@ -30,19 +27,15 @@ namespace PEC2.Entities
         public float launchForce = 15f;
 
         /// <value>Property <c>maxDamage</c> represents the amount of damage done if the explosion is centred on a tank.</value>
-        [FormerlySerializedAs("m_MaxDamage")]
         public float maxDamage = 100f;
 
         /// <value>Property <c>explosionForce</c> represents the amount of force added to a tank at the centre of the explosion.</value>
-        [FormerlySerializedAs("m_ExplosionForce")]
         public float explosionForce = 1000f;
 
         /// <value>Property <c>maxLifeTime</c> represents the time in seconds before the shell is removed.</value>
-        [FormerlySerializedAs("m_MaxLifeTime")]
         public float maxLifeTime = 2f;
 
         /// <value>Property <c>explosionRadius</c> represents the maximum distance away from the explosion tanks can be and are still affected.</value>
-        [FormerlySerializedAs("m_ExplosionRadius")]
         public float explosionRadius = 5f;
 
         /// <summary>
@@ -103,7 +96,6 @@ namespace PEC2.Entities
             explosionParticles.Play();
 
             // Play the explosion sound effect.
-            audioSource.Stop();
             audioSource.clip = explosionClip;
             audioSource.Play();
 
