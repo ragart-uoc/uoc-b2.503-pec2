@@ -243,13 +243,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkDiscovery: {fileID: 487876116}
   serverIP: localhost
-  BotonesInicio: {fileID: 1134756351}
-  PanelServidor: {fileID: 137082642}
-  PanelJugador: {fileID: 1575966036}
-  PanelPartidas: {fileID: 922323158}
-  PartidaEncontradaPrefab: {fileID: 867760426860397305, guid: 64ff89840d1ec764ba7740487d88ad11,
+  MenuButtons: {fileID: 1134756351}
+  ServerPanel: {fileID: 137082642}
+  PlayerPanel: {fileID: 1575966036}
+  DiscoveredGamesPanel: {fileID: 922323158}
+  DiscoveredGamePrefab: {fileID: 867760426860397305, guid: 64ff89840d1ec764ba7740487d88ad11,
     type: 3}
-  ActualizaServidoresButton: {fileID: 442958751}
+  RefreshServersButton: {fileID: 442958751}
 --- !u!114 &41287231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 137082645}
   - component: {fileID: 137082644}
   m_Layer: 5
-  m_Name: PanelModoServidor
+  m_Name: ServerModePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -499,7 +499,7 @@ GameObject:
   - component: {fileID: 313132185}
   - component: {fileID: 313132184}
   m_Layer: 5
-  m_Name: Titulo
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -545,7 +545,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Modo Jugador
+  m_text: Player Mode
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f2ff0a0b48f71d84dbf8eaccbfd8dbaa, type: 2}
   m_sharedMaterial: {fileID: -8058474179388989601, guid: f2ff0a0b48f71d84dbf8eaccbfd8dbaa,
@@ -694,7 +694,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Crear servidor dedicado
+  m_Text: 'Create dedicated server
 
 '
 --- !u!222 &440947078
@@ -770,7 +770,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: ActualizaServidoresAction
+        m_MethodName: UpdateServersAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1136,9 +1136,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Crear Partida
-
-'
+  m_Text: Create Game
 --- !u!222 &507328338
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1160,7 +1158,7 @@ GameObject:
   - component: {fileID: 574969344}
   - component: {fileID: 574969343}
   m_Layer: 5
-  m_Name: UnirsePartidaButton
+  m_Name: JoinGameButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1233,7 +1231,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: UnirsePartida
+        m_MethodName: JoinGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1293,7 +1291,7 @@ GameObject:
   - component: {fileID: 611084353}
   - component: {fileID: 611084352}
   m_Layer: 5
-  m_Name: Titulo
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1430,7 +1428,7 @@ GameObject:
   - component: {fileID: 709882742}
   - component: {fileID: 709882741}
   m_Layer: 5
-  m_Name: ModoServidorButton
+  m_Name: ServerModeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1503,7 +1501,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: ModoServidorAction
+        m_MethodName: ServerModeAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1622,7 +1620,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Modo Jugador
+  m_Text: Player mode
 --- !u!222 &720669498
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1702,9 +1700,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Unirse a partida
-
-'
+  m_Text: Join game
 --- !u!222 &777719795
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1726,7 +1722,7 @@ GameObject:
   - component: {fileID: 922323160}
   - component: {fileID: 922323162}
   m_Layer: 5
-  m_Name: PanelPartidas
+  m_Name: DiscoveredGamesPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1830,7 +1826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1134756352}
   m_Layer: 5
-  m_Name: BotonesInicio
+  m_Name: MenuButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1965,7 +1961,7 @@ GameObject:
   - component: {fileID: 1291511691}
   - component: {fileID: 1291511690}
   m_Layer: 5
-  m_Name: Titulo
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2011,7 +2007,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Modo Servidor
+  m_text: Server Mode
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f2ff0a0b48f71d84dbf8eaccbfd8dbaa, type: 2}
   m_sharedMaterial: {fileID: -8058474179388989601, guid: f2ff0a0b48f71d84dbf8eaccbfd8dbaa,
@@ -2101,7 +2097,7 @@ GameObject:
   - component: {fileID: 1575966039}
   - component: {fileID: 1575966038}
   m_Layer: 5
-  m_Name: PanelModoJugador
+  m_Name: PlayerModePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2229,7 +2225,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Actualizar
+  m_text: Refresh
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 367de94c776cc5348b0fd083b0945e98, type: 2}
   m_sharedMaterial: {fileID: -8058474179388989601, guid: 367de94c776cc5348b0fd083b0945e98,
@@ -2320,7 +2316,7 @@ GameObject:
   - component: {fileID: 1685631849}
   - component: {fileID: 1685631848}
   m_Layer: 5
-  m_Name: CrearPartidaButton
+  m_Name: CreateGameButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2393,7 +2389,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: CrearPartida
+        m_MethodName: CreateGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2512,7 +2508,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Modo Servidor
+  m_Text: Server mode
 --- !u!222 &1716565925
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2534,7 +2530,7 @@ GameObject:
   - component: {fileID: 1794404719}
   - component: {fileID: 1794404718}
   m_Layer: 5
-  m_Name: ModoJugadorButton
+  m_Name: PlayerModeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2607,7 +2603,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: ModoJugadorAction
+        m_MethodName: PlayerModeAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2668,7 +2664,7 @@ GameObject:
   - component: {fileID: 1832426189}
   - component: {fileID: 1832426188}
   m_Layer: 5
-  m_Name: CrearServidorDedicadoButton
+  m_Name: CreateDedicatedServerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2741,7 +2737,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 41287230}
         m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: CrearServidorDedicadoAction
+        m_MethodName: CreateDedicatedServerAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

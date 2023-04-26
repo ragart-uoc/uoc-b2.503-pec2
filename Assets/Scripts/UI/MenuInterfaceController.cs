@@ -14,24 +14,24 @@ namespace PEC2
         public NetworkDiscovery networkDiscovery;
 
         // Listado de partidas encontradas
-        private List<PartidaEncontrada> PartidasEncontradas;
+        private List<DiscoveredGame> DiscoveredGamesList;
 
         // Para jugar en LAN, especificar IP del servidor
         public string serverIP = "localhost";
 
         // Inspector objects
 
-        public GameObject BotonesInicio;
+        public GameObject MenuButtons;
 
-        public GameObject PanelServidor;
+        public GameObject ServerPanel;
 
-        public GameObject PanelJugador;
+        public GameObject PlayerPanel;
 
-        public GameObject PanelPartidas;
+        public GameObject DiscoveredGamesPanel;
 
-        public GameObject PartidaEncontradaPrefab;
+        public GameObject DiscoveredGamePrefab;
 
-        public GameObject ActualizaServidoresButton;
+        public GameObject RefreshServersButton;
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -45,23 +45,23 @@ namespace PEC2
         }
 #endif
 
-        public void ModoServidorAction(){
-            BotonesInicio.SetActive(false);
-            PanelServidor.SetActive(true);
+        public void ServerModeAction(){
+            MenuButtons.SetActive(false);
+            ServerPanel.SetActive(true);
         }
 
-        public void ModoJugadorAction(){
-            BotonesInicio.SetActive(false);
-            PanelJugador.SetActive(true);
+        public void PlayerModeAction(){
+            MenuButtons.SetActive(false);
+            PlayerPanel.SetActive(true);
             
             // Comienza Network Discovery
             Debug.Log("Actualizando servidores...");
             discoveredServers.Clear();
             networkDiscovery.StartDiscovery();
-            PartidasEncontradas = new List<PartidaEncontrada>();
+            DiscoveredGamesList = new List<DiscoveredGame>();
         }
 
-        public void CrearServidorDedicadoAction(){
+        public void CreateDedicatedServerAction(){
             if (!NetworkClient.isConnected && !NetworkServer.active) {
                 if (!NetworkClient.active) {
                     discoveredServers.Clear();
@@ -71,33 +71,33 @@ namespace PEC2
             }
         }
 
-        public void ActualizaServidoresAction(){
+        public void UpdateServersAction(){
             // Borramos la lista antigua
-            if(PartidasEncontradas.Count > 0){
-                foreach(PartidaEncontrada partidaEncontrada in PartidasEncontradas){
-                    Destroy(partidaEncontrada.banner);
+            if(DiscoveredGamesList.Count > 0){
+                foreach(DiscoveredGame discoveredGame in DiscoveredGamesList){
+                    Destroy(discoveredGame.banner);
                 }
-                PartidasEncontradas.Clear();
+                DiscoveredGamesList.Clear();
             }
 
             // Generamos la lista nueva
             int i = 0;
             foreach (ServerResponse info in discoveredServers.Values)
             {
-                PartidaEncontrada partidaEncontrada = new PartidaEncontrada();
-                partidaEncontrada.banner = Instantiate(PartidaEncontradaPrefab);
-                partidaEncontrada.banner.transform.SetParent(PanelPartidas.transform, false);
-                RectTransform rectTransform = partidaEncontrada.banner.GetComponent<RectTransform>();
+                DiscoveredGame discoveredGame = new DiscoveredGame();
+                discoveredGame.banner = Instantiate(DiscoveredGamePrefab);
+                discoveredGame.banner.transform.SetParent(DiscoveredGamesPanel.transform, false);
+                RectTransform rectTransform = discoveredGame.banner.GetComponent<RectTransform>();
                 rectTransform.Translate(0, -60*i, 0);
-                partidaEncontrada.address = info;
+                discoveredGame.address = info;
 
-                Button button = partidaEncontrada.banner.GetComponentInChildren<Button>();
-                button.onClick.AddListener(delegate {JoinServer(partidaEncontrada.address);});
+                Button button = discoveredGame.banner.GetComponentInChildren<Button>();
+                button.onClick.AddListener(delegate {JoinServer(discoveredGame.address);});
 
-                TMPro.TextMeshProUGUI texto = partidaEncontrada.banner.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                texto.SetText(partidaEncontrada.address.EndPoint.Address.ToString());
+                TMPro.TextMeshProUGUI texto = discoveredGame.banner.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                texto.SetText(discoveredGame.address.EndPoint.Address.ToString());
 
-                PartidasEncontradas.Add(partidaEncontrada);
+                DiscoveredGamesList.Add(discoveredGame);
                 i++;
             }
             Debug.Log(" -> " + i + " servidores encontrados!");
@@ -108,12 +108,12 @@ namespace PEC2
             NetworkManager.singleton.StartClient(info.uri);
         }
 
-        public class PartidaEncontrada{
+        public class DiscoveredGame{
             public ServerResponse address{get; set;}
             public GameObject banner{get; set;}
         }
 
-        public void CrearPartida(){
+        public void CreateGame(){
             Debug.Log(" -> Crear partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
@@ -124,7 +124,7 @@ namespace PEC2
             }
         }
 
-        public void UnirsePartida(){
+        public void JoinGame(){
             Debug.Log(" -> Unirse a partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
