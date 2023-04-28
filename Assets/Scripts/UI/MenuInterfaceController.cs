@@ -9,6 +9,12 @@ namespace PEC2
 {
     public class MenuInterfaceController : MonoBehaviour
     {
+
+        public class DiscoveredGame{
+            public ServerResponse address{get; set;}
+            public GameObject banner{get; set;}
+        }
+
         readonly Dictionary<long, ServerResponse> discoveredServers = new Dictionary<long, ServerResponse>();
         Vector2 scrollViewPos = Vector2.zero;
         public NetworkDiscovery networkDiscovery;
@@ -32,6 +38,10 @@ namespace PEC2
         public GameObject DiscoveredGamePrefab;
 
         public GameObject RefreshServersButton;
+
+        public GameObject PlayerNameInput;
+
+        public GameObject PlayerColorInput;
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -103,20 +113,52 @@ namespace PEC2
             Debug.Log(" -> " + i + " servidores encontrados!");
         }
 
-        private void JoinServer(ServerResponse info){
-            networkDiscovery.StopDiscovery();
-            NetworkManager.singleton.StartClient(info.uri);
+        // We save Player Name and Color
+        private void SaveSettings(){
+            // Save Name
+            string NameText = PlayerNameInput.GetComponent<TMPro.TMP_InputField>().text;
+            if(NameText != null && !NameText.Trim().Equals("")){
+                // Playerprefs Name
+                PlayerPrefs.SetString("PlayerName", NameText);
+                Debug.Log("Playerprefs name: " + NameText);
+            }
+            // Save Color
+            TMPro.TMP_Dropdown dropdown = PlayerColorInput.GetComponent<TMPro.TMP_Dropdown>();
+            string ColorText = dropdown.options[dropdown.value].text;
+            if(ColorText != null && !ColorText.Trim().Equals("")){
+                string ActualColorString = ConvertStringToColorString(ColorText);
+                if(!ActualColorString.Equals("")){
+                    // Playerprefs Color
+                    PlayerPrefs.SetString("PlayerColor", ActualColorString);
+                    Debug.Log("Playerprefs color: " + ActualColorString);
+                }
+            }
         }
 
-        public class DiscoveredGame{
-            public ServerResponse address{get; set;}
-            public GameObject banner{get; set;}
+        private string ConvertStringToColorString(string ColorName){
+            if(ColorName.Equals("Blue")){
+                return "0,0,255";
+            }else if(ColorName.Equals("Green")){
+                return "0,255,0";
+            }else if(ColorName.Equals("Yellow")){
+                return "255,234,4";
+            }else if(ColorName.Equals("Red")){
+                return "255,0,0";
+            }
+            return "";
+        }
+
+        private void JoinServer(ServerResponse info){
+            SaveSettings();
+            networkDiscovery.StopDiscovery();
+            NetworkManager.singleton.StartClient(info.uri);
         }
 
         public void CreateGame(){
             Debug.Log(" -> Crear partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
+                    SaveSettings();
                     discoveredServers.Clear();
                     NetworkManager.singleton.StartHost();
                     networkDiscovery.AdvertiseServer();
@@ -128,7 +170,7 @@ namespace PEC2
             Debug.Log(" -> Unirse a partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
-                    Debug.Log(" Cliente desconectado + servidor inactivo + cliente inactivo...");
+                    SaveSettings();
                     NetworkManager.singleton.networkAddress = serverIP;
                     NetworkManager.singleton.StartClient();
                 }
