@@ -25,13 +25,13 @@ namespace PEC2.Entities
         [SyncVar(hook = "OnChangeColor")]
         public Color playerColor;
 
-        /// <value>Property <c>coloredPlayerText</c> represents the player with their number colored to match their tank.</value>
+        /// <value>Property <c>coloredPlayerName</c> represents the name of the player with the color tag.</value>
         [HideInInspector]
-        [SyncVar]
-        public string coloredPlayerText;
+        [SyncVar (hook = "OnChangeColoredPlayerName")]
+        public string coloredPlayerName;
 
         /// <value>Property <c>wins</c> represents the number of wins this player has so far.</value>
-        [SyncVar]
+        [SyncVar(hook = "OnChangeWins")]
         public int wins;
         
         /// <value>Property <c>controlsEnabled</c> represents whether or not the tank is currently controllable.</value>
@@ -55,6 +55,21 @@ namespace PEC2.Entities
 
         /// <value>Property <c>m_CameraManager</c> is used to add the tank to the group camera.</value>
         private CameraManager m_CameraManager;
+        
+        /// <value>Property <c>playerInfoPrefab</c> represents the player info prefab.</value>
+        public GameObject playerInfoPrefab;
+        
+        /// <value>Property <c>m_PlayersInfoPanel</c> represents the players info panel.</value>
+        private GameObject m_PlayersInfoPanel;
+        
+        /// <value>Property <c>m_PlayerInfo</c> represents the player info.</value>
+        private GameObject m_PlayerInfo;
+        
+        /// <value>Property <c>m_PlayerInfoNameText</c> represents the player info name text.</value>
+        private TextMeshProUGUI m_PlayerInfoNameText;
+        
+        /// <value>Property <c>m_PlayerInfoWinsText</c> represents the player info wins text.</value>
+        private TextMeshProUGUI m_PlayerInfoWinsText;
 
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
@@ -80,6 +95,13 @@ namespace PEC2.Entities
             m_CameraManager = GameObject.Find("CameraManager").GetComponent<CameraManager>();
             m_TankHealth = GetComponent<TankHealth>();
             
+            // Create the player info
+            m_PlayersInfoPanel = GameObject.Find("PlayersInfo");
+            m_PlayerInfo = Instantiate(playerInfoPrefab, m_PlayersInfoPanel.transform);
+            m_PlayerInfo.transform.SetParent(m_PlayersInfoPanel.transform);
+            m_PlayerInfoNameText = m_PlayerInfo.transform.Find("PlayerInfoName").GetComponent<TextMeshProUGUI>();
+            m_PlayerInfoWinsText = m_PlayerInfo.transform.Find("PlayerInfoWins").GetComponent<TextMeshProUGUI>();
+            
             // Get player name from PlayerPrefs
             var newPlayerName = PlayerPrefs.GetString("PlayerName", "Player " + netId);
             SetName(newPlayerName);
@@ -92,12 +114,25 @@ namespace PEC2.Entities
                 ? ColorStrings.ColorFromString(playerColorString)
                 : Color.blue;
             SetColor(newPlayerColor);
-                
+            
+            // Update the player info for non-local players
+            if (!isLocalPlayer)
+                OnChangeColoredPlayerName(coloredPlayerName, coloredPlayerName);
+
             // Refresh the group camera targets
             m_CameraManager.UpdateTargetGroup();
             
             // Disable controls depeding on the game state
             EnableControls(m_GameManager.controlsEnabled);
+        }
+        
+        /// <summary>
+        /// Method <c>OnStopClient</c> is called when the client stops.
+        /// </summary>
+        public override void OnStopClient()
+        {
+            // Remove the player info
+            Destroy(m_PlayerInfo.gameObject);
         }
 
         /// <summary>
@@ -168,6 +203,9 @@ namespace PEC2.Entities
         {
             // Change the name of the player
             playerNameText.text = newName;
+            
+            // Update the colored player name
+            UpdateColoredPlayerName();
         }
         
         /// <summary>
@@ -189,7 +227,6 @@ namespace PEC2.Entities
         public void CmdSetColor(Color newColor)
         {
             playerColor = newColor;
-            coloredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
             OnChangeColor(playerColor, newColor);
         }
         
@@ -212,6 +249,56 @@ namespace PEC2.Entities
             
             // Change the color of the player name
             playerNameText.color = newColor;
+            
+            // Update the colored player name
+            UpdateColoredPlayerName();
+        }
+        
+        /// <summary>
+        /// Method <c>UpdateColoredPlayerName</c> is used to update the colored player name.
+        /// </summary>
+        private void UpdateColoredPlayerName()
+        {
+            if (!isLocalPlayer)
+                return;
+            var newColoredPlayerName = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
+            CmdUpdateColoredPlayerName(newColoredPlayerName);
+        }
+        
+        /// <summary>
+        /// Command <c>CmdUpdateColoredPlayerName</c> is used to update the colored player name.
+        /// </summary>
+        /// <param name="newColoredPlayerName">The new colored player name.</param>
+        [Command]
+        public void CmdUpdateColoredPlayerName(string newColoredPlayerName)
+        {
+            coloredPlayerName = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
+            OnChangeColoredPlayerName(coloredPlayerName, coloredPlayerName);
+        }
+        
+        /// <summary>
+        /// Method <c>OnChangeColoredPlayerName</c> is used to update the colored player name.
+        /// </summary>
+        /// <param name="oldColoredPlayerName">The old colored player name.</param>
+        /// <param name="newColoredPlayerName">The new colored player name.</param>
+        private void OnChangeColoredPlayerName(string oldColoredPlayerName, string newColoredPlayerName)
+        {
+            if (m_PlayerInfo == null)
+                return;
+            // Change the name of the player info
+            m_PlayerInfoNameText.text = newColoredPlayerName;
+        }
+        
+        /// <summary>
+        /// Method <c>OnChangeWins</c> is used to update the UI.
+        /// </summary>
+        public void OnChangeWins(int oldWins, int newWins)
+        {
+            if (m_PlayerInfo == null)
+                return;
+            // Update the UI
+            m_PlayerInfoNameText.text = coloredPlayerName;
+            m_PlayerInfoWinsText.text = "WINS: " + newWins;
         }
         
         /// <summary>

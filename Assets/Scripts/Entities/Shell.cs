@@ -46,10 +46,13 @@ namespace PEC2.Entities
             // Set the shell's velocity to the launch force in the fire position's forward direction
             GetComponent<Rigidbody>().velocity = launchForce * transform.forward;
 
-            // Change the clip to the firing clip and play i
-            audioSource.clip = fireClip;
-            audioSource.Play();
-            
+            // Change the clip to the firing clip and play it
+            if (audioSource.enabled)
+            {
+                audioSource.clip = fireClip;
+                audioSource.Play();
+            }
+
             // If it isn't destroyed by then, destroy the shell after it's lifetime
             Destroy(gameObject, maxLifeTime);
         }
@@ -96,8 +99,11 @@ namespace PEC2.Entities
             explosionParticles.Play();
 
             // Play the explosion sound effect.
-            audioSource.clip = explosionClip;
-            audioSource.Play();
+            if (audioSource.enabled)
+            {
+                audioSource.clip = explosionClip;
+                audioSource.Play();
+            }
 
             // Once the particles have finished, destroy the gameobject they are on.
             var mainModule = explosionParticles.main;

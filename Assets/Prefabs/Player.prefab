@@ -10486,6 +10486,9 @@ MonoBehaviour:
   coloredPlayerText: 
   wins: 0
   controlsEnabled: 1
+  playersInfoPanel: {fileID: 0}
+  playerInfoPrefab: {fileID: 1149367535550888100, guid: 2d1d73be3758cdb47a9d5d2eb82d1f4e,
+    type: 3}
 --- !u!114 &11443146
 MonoBehaviour:
   m_ObjectHideFlags: 0

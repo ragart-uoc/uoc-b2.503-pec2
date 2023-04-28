@@ -112,19 +112,9 @@ namespace PEC2.Entities
             // Set the flag so that this function is only called once
             m_Dead = true;
             
-            // Instantiate the explosion prefab and get a reference to the particle system on it.
-            var goTransform = transform;
-            var explosionParticles = Instantiate(explosionPrefab, goTransform.position, goTransform.rotation)
-                .GetComponent<ParticleSystem>();
-
-            // Get a reference to the audio source on the instantiated prefab.
-            var explosionAudio = explosionParticles.GetComponent<AudioSource>();
-
-            // Play the particle system of the tank exploding
-            explosionParticles.Play();
-
-            // Play the tank explosion sound effect
-            explosionAudio.Play();
+            // Explode
+            OnExplode();
+            RpcExplode();
 
             // Destroy or disable the tank
             if (destroyOnDeath)
@@ -140,6 +130,29 @@ namespace PEC2.Entities
                 
             // Refresh the group camera targets
             m_CameraManager.UpdateTargetGroup();
+        }
+        
+        [ClientRpc]
+        private void RpcExplode()
+        {
+            OnExplode();
+        }
+
+        private void OnExplode()
+        {
+            // Instantiate the explosion prefab and get a reference to the particle system on it.
+            var goTransform = transform;
+            var explosionParticles = Instantiate(explosionPrefab, goTransform.position, goTransform.rotation)
+                .GetComponent<ParticleSystem>();
+
+            // Get a reference to the audio source on the instantiated prefab.
+            var explosionAudio = explosionParticles.GetComponent<AudioSource>();
+
+            // Play the particle system of the tank exploding
+            explosionParticles.Play();
+
+            // Play the tank explosion sound effect
+            explosionAudio.Play();
         }
         
         /// <summary>

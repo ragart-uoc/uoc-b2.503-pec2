@@ -127,6 +127,9 @@ namespace PEC2.Managers
             if (!isServer)
                 return;
             
+            // Reset the game started flag
+            m_GameStarted = false;
+            
             // Reset rounds and winners
             m_RoundNumber = 0;
             m_RoundWinner = null;
@@ -143,9 +146,6 @@ namespace PEC2.Managers
             
             // Reset the message text
             WriteMessage(String.Empty);
-            
-            // Reset the game started flag
-            m_GameStarted = false;
         }
 
         /// <summary>
@@ -287,7 +287,8 @@ namespace PEC2.Managers
         {
             var activePlayers = GetAlivePlayers();
             var activeEnemies = GetAliveEnemies();
-            return activePlayers.Count == 0
+            return CheckActiveConnections() == 1
+                   || activePlayers.Count == 0
                    || (activePlayers.Count == 1 && activeEnemies.Count == 0);
         }
 
@@ -305,9 +306,10 @@ namespace PEC2.Managers
         /// </summary>
         private Tank GetGameWinner()
         {
+            var allPlayers = GetAllPlayers();
             var activePlayers = GetAlivePlayers();
             return CheckActiveConnections() == 1
-                ? activePlayers.FirstOrDefault()?.GetComponent<Tank>()
+                ? allPlayers.FirstOrDefault()?.GetComponent<Tank>()
                 : activePlayers.FirstOrDefault(p => p.GetComponent<Tank>().wins == roundsToWin)?
                     .GetComponent<Tank>();
         }
@@ -322,7 +324,7 @@ namespace PEC2.Managers
 
             // If there is a winner then change the message to reflect that
             if (m_RoundWinner != null)
-                message = m_RoundWinner.coloredPlayerText + " WINS THE ROUND!";
+                message = m_RoundWinner.coloredPlayerName + " WINS THE ROUND!";
 
             // Add some line breaks after the initial message
             message += "\n\n\n\n";
@@ -332,12 +334,12 @@ namespace PEC2.Managers
             foreach (var player in players)
             {
                 var playerTank = player.GetComponent<Tank>();
-                message += playerTank.coloredPlayerText + ": " + playerTank.wins + " WINS\n";
+                message += playerTank.coloredPlayerName + ": " + playerTank.wins + " WINS\n";
             }
 
             // If there is a game winner, change the entire message to reflect that
             if (m_GameWinner != null)
-                message = m_GameWinner.coloredPlayerText + " WINS THE GAME!";
+                message = m_GameWinner.coloredPlayerName + " WINS THE GAME!";
 
             return message;
         }
