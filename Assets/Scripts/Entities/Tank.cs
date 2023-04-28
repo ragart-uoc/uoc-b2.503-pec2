@@ -52,6 +52,9 @@ namespace PEC2.Entities
         
         /// <value>Property <c>m_GameManager</c> represents the game manager.</value>
         private GameManager m_GameManager;
+        
+        /// <value>Property <c>m_UIManager</c> represents the UI manager.</value>
+        private UIManager m_UIManager;
 
         /// <value>Property <c>m_CameraManager</c> is used to add the tank to the group camera.</value>
         private CameraManager m_CameraManager;
@@ -70,6 +73,12 @@ namespace PEC2.Entities
         
         /// <value>Property <c>m_PlayerInfoWinsText</c> represents the player info wins text.</value>
         private TextMeshProUGUI m_PlayerInfoWinsText;
+
+        /// <value>Property <c>m_EventsRegistrable</c> represents whether or not the events are registrable.</value>
+        private bool m_EventsRegistrable;
+        
+        /// <value>Property <c>m_PlayerHasJoined</c> represents whether or not the player has joined.</value>
+        private bool m_PlayerHasJoined;
 
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
@@ -92,6 +101,7 @@ namespace PEC2.Entities
         {
             // Get references to the components
             m_GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+            m_UIManager = GameObject.Find("UIManager").GetComponent<UIManager>();
             m_CameraManager = GameObject.Find("CameraManager").GetComponent<CameraManager>();
             m_TankHealth = GetComponent<TankHealth>();
             
@@ -124,8 +134,20 @@ namespace PEC2.Entities
             
             // Disable controls depeding on the game state
             EnableControls(m_GameManager.controlsEnabled);
+            
+            // Dispatch the event
+            m_EventsRegistrable = true;
+            m_UIManager.SendEvent(coloredPlayerName + " joined the game", 2f);
         }
-        
+
+        /// <summary>
+        /// Method <c>OnDisable</c> is called when the behaviour becomes disabled.
+        /// </summary>
+        private void OnDisable()
+        {
+            m_UIManager.SendEvent(coloredPlayerName + " died", 2f);
+        }
+
         /// <summary>
         /// Method <c>OnStopClient</c> is called when the client stops.
         /// </summary>
@@ -133,6 +155,9 @@ namespace PEC2.Entities
         {
             // Remove the player info
             Destroy(m_PlayerInfo.gameObject);
+            
+            // Dispatch the event
+            m_UIManager.SendEvent(coloredPlayerName + " has left the game", 2f);
         }
 
         /// <summary>
@@ -203,9 +228,14 @@ namespace PEC2.Entities
         {
             // Change the name of the player
             playerNameText.text = newName;
-            
+
             // Update the colored player name
+            var oldColoredPlayerName = coloredPlayerName;
             UpdateColoredPlayerName();
+            
+            // Dispatch the event
+            if (m_UIManager != null && m_EventsRegistrable)
+                m_UIManager.SendEvent(oldColoredPlayerName + " changed name to " + coloredPlayerName, 2f);
         }
         
         /// <summary>
@@ -252,6 +282,10 @@ namespace PEC2.Entities
             
             // Update the colored player name
             UpdateColoredPlayerName();
+            
+            // Dispatch the event
+            if (m_UIManager != null && m_EventsRegistrable)
+                m_UIManager.SendEvent(coloredPlayerName + " changed color", 2f);
         }
         
         /// <summary>
@@ -281,7 +315,7 @@ namespace PEC2.Entities
         /// </summary>
         /// <param name="oldColoredPlayerName">The old colored player name.</param>
         /// <param name="newColoredPlayerName">The new colored player name.</param>
-        private void OnChangeColoredPlayerName(string oldColoredPlayerName, string newColoredPlayerName)
+        public void OnChangeColoredPlayerName(string oldColoredPlayerName, string newColoredPlayerName)
         {
             if (m_PlayerInfo == null)
                 return;

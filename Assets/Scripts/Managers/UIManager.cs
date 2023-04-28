@@ -1,94 +1,104 @@
+using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using TMPro;
 using Mirror;
-using PEC2.Entities;
+using TMPro;
 
 namespace PEC2.Managers
 {
-    public class UIManager : MonoBehaviour
+    /// <summary>
+    /// Class <c>UIManager</c> controls the UI of the game.
+    /// </summary>
+    public class UIManager : NetworkBehaviour
     {
         /// <value>Property <c>_instance</c> represents the singleton instance of the class.</value>
         private static UIManager _instance;
 
-        /// <value>Property <c>menu</c> is a reference to the in-game menu.</value>
-        public GameObject menu;
+        /// <value>Property <c>messageText</c> is a reference to the overlay Text to display winning text, etc.</value>
+        public TextMeshProUGUI messageText;
 
+        /// <value>Property <c>eventContainer</c> is a reference to the event container.</value>
+        public GameObject eventContainer;
+        
+        /// <value>Property <c>eventPrefab</c> is a reference to the event prefab.</value>
+        public GameObject eventPrefab;
+        
         /// <summary>
-        /// Method <c>Awake</c> is called when the script instance is being loaded.
+        /// Method <c>WriteMessage</c> is used to write a message to the screen.
         /// </summary>
-        private void Awake()
+        /// <param name="message">The message to write to the screen</param>
+        public void WriteMessage(string message)
         {
-            // Singleton pattern
-            if (_instance != null && _instance != this)
+            if (!isServer)
+                return;
+            messageText.text = message;
+            RpcWriteMessage(message);
+        }
+        
+        /// <summary>
+        /// Method <c>RpcWriteMessage</c> is used to write a message to the screen on the client.
+        /// </summary>
+        /// <param name="message">The message to write to the screen</param>
+        [ClientRpc]
+        private void RpcWriteMessage(string message)
+        {
+            messageText.text = message;
+        }
+        
+        /// <summary>
+        /// Method <b>BlinkingMessage</b> is used to display a message on the screen for a specified duration.
+        /// </summary>
+        /// <param name="message">The message to display</param>
+        /// <param name="duration">The duration to display the message for</param>
+        public IEnumerator BlinkingMessage(string message, float duration = 0)
+        {
+            var time = 0f;
+            // If duration equals 0, then the message will blink forever
+            while (duration == 0 || time < duration)
             {
-                Destroy(gameObject);
-                return;
+                WriteMessage(message);
+                yield return new WaitForSeconds(.5f);
+                WriteMessage(String.Empty);
+                yield return new WaitForSeconds(.5f);
+                time += 1f;
             }
-
-            _instance = this;
         }
         
         /// <summary>
-        /// Method <c>OnMenu</c> is called when the menu button is pressed.
+        /// Method <c>SendEvent</c> is used to send an event to the event container.
         /// </summary>
-        private void OnMenu(InputValue inputValue)
+        /// <param name="message">The message to send</param>
+        /// <param name="duration">The duration to display the message for</param>
+        public void SendEvent(string message, float duration)
         {
-            if (!NetworkClient.isConnected)
+            if (!isServer)
                 return;
-            ToggleMenu();
-        }
-
-        /// <summary>
-        /// Method <c>ChangePlayerName</c> is used to change the player name.
-        /// </summary>
-        /// <param name="newName">The new player name.</param>
-        public void ChangePlayerName(string newName)
-        {
-            if (!NetworkClient.isConnected)
-                return;
-            NetworkClient.localPlayer.GetComponent<Tank>().SetName(newName);
+            StartCoroutine(OnSendEvent(message, duration));
+            RpcSendEvent(message, duration);
         }
         
         /// <summary>
-        /// Method <c>ChangePlayerColor</c> is used to change the player color.
+        /// Method <c>RpcSendEvent</c> is used to send an event to the event container on the client.
         /// </summary>
-        /// <param name="dropdown">The dropdown menu.</param>
-        public void ChangePlayerColor(TMP_Dropdown dropdown)
+        /// <param name="message">The message to send</param>
+        /// <param name="duration">The duration to display the message for</param>
+        [ClientRpc]
+        private void RpcSendEvent(string message, float duration)
         {
-            if (!NetworkClient.isConnected)
-                return;
-            var color = dropdown.options[dropdown.value].text;
-            if (ColorUtility.TryParseHtmlString(color, out var newColor))
-                NetworkClient.localPlayer.GetComponent<Tank>().SetColor(newColor);
+            StartCoroutine(OnSendEvent(message, duration));
         }
 
         /// <summary>
-        /// Method <c>ToggleMenu</c> is used to show or hide the menu.
+        /// Method <c>OnSendEvent</c> is used to send an event to the event container.
         /// </summary>
-        public void ToggleMenu()
+        /// <param name="message">The message to send</param>
+        /// <param name="duration">The duration to display the message for</param>
+        private IEnumerator OnSendEvent(string message, float duration)
         {
-            menu.SetActive(!menu.activeSelf);
-        }
-
-        /// <summary>
-        /// Method <c>GoToMainMenu</c> loads the main menu scene.
-        /// </summary>
-        public void GoToMainMenu()
-        {
-            SceneManager.LoadScene("MainMenu");
-        }
-
-        /// <summary>
-        /// Method <c>QuitGame</c> quits the game.
-        /// </summary>
-        public void QuitGame()
-        {
-            Application.Quit();
-            #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-            #endif
+            var newEvent = Instantiate(eventPrefab, eventContainer.transform);
+            newEvent.GetComponent<TextMeshProUGUI>().text = message;
+            yield return new WaitForSeconds(duration);
+            Destroy(newEvent);
         }
     }
 }

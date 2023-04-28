@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using TMPro;
 using Mirror;
 using PEC2.Entities;
 
@@ -29,11 +28,11 @@ namespace PEC2.Managers
         /// <value>Property <c>controlsEnabled</c> is used to check if the controls are enabled.</value>
         [SyncVar(hook = "OnChangeControlsEnabled")]
         public bool controlsEnabled;
-
-        /// <value>Property <c>messageText</c> is a reference to the overlay Text to display winning text, etc.</value>
-        public TextMeshProUGUI messageText;
         
-        /// <value>Property <c>npcManager</c> is a reference to the npc manager.</value>
+        /// <value>Property <c>uiManager</c> is a reference to the UI manager.</value>
+        public UIManager uiManager;
+        
+        /// <value>Property <c>npcManager</c> is a reference to the NPC manager.</value>
         public NpcManager npcManager;
         
         /// <value>Property <c>m_MessageCoroutine</c> is used to start and stop the message coroutine.</value>
@@ -145,7 +144,7 @@ namespace PEC2.Managers
                 StopCoroutine(m_MessageCoroutine);
             
             // Reset the message text
-            WriteMessage(String.Empty);
+            uiManager.WriteMessage(String.Empty);
         }
 
         /// <summary>
@@ -195,7 +194,7 @@ namespace PEC2.Managers
             controlsEnabled = false;
             
             // Print waiting for players message
-            m_MessageCoroutine = StartCoroutine(BlinkingMessage("Waiting for players..."));
+            m_MessageCoroutine = StartCoroutine(uiManager.BlinkingMessage("Waiting for players..."));
             
             // Do not start the game until at least two players are connected
             while (CheckActiveConnections() < 2)
@@ -220,7 +219,7 @@ namespace PEC2.Managers
 
             // Increment the round number and display text showing the players what round it is
             m_RoundNumber++;
-            WriteMessage("ROUND " + m_RoundNumber);
+            uiManager.WriteMessage("ROUND " + m_RoundNumber);
 
             // Wait for the specified length of time until yielding control back to the game loop
             yield return m_StartWait;
@@ -238,7 +237,7 @@ namespace PEC2.Managers
             controlsEnabled = true;
 
             // Clear the text from the screen
-            WriteMessage(string.Empty);
+            uiManager.WriteMessage(string.Empty);
 
             // While there is not one tank left...
             while (!RoundIsOver())
@@ -274,7 +273,7 @@ namespace PEC2.Managers
 
             // Get a message based on the scores and whether or not there is a game winner and display it
             var message = EndMessage();
-            WriteMessage(message);
+            uiManager.WriteMessage(message);
 
             // Wait for the specified length of time until yielding control back to the game loop
             yield return m_EndWait;
@@ -370,25 +369,6 @@ namespace PEC2.Managers
                 player.GetComponent<Tank>().controlsEnabled = newControlsEnabled;
             }
         }
-        
-        /// <summary>
-        /// Method <b>BlindingMessage</b> is used to display a message on the screen for a specified duration.
-        /// </summary>
-        /// <param name="message">The message to display</param>
-        /// <param name="duration">The duration to display the message for</param>
-        private IEnumerator BlinkingMessage(string message, float duration = 0)
-        {
-            var time = 0f;
-            // If duration equals 0, then the message will blink forever
-            while (duration == 0 || time < duration)
-            {
-                WriteMessage(message);
-                yield return new WaitForSeconds(.5f);
-                WriteMessage(String.Empty);
-                yield return new WaitForSeconds(.5f);
-                time += 1f;
-            }
-        }
 
         /// <summary>
         /// Method <c>CheckActiveConnections</c> is used to check how many active connections there are.
@@ -440,28 +420,6 @@ namespace PEC2.Managers
                 .Where(p => p.CompareTag("Enemy"))
                 .ToList();
             return players;
-        }
-        
-        /// <summary>
-        /// Method <c>WriteMessage</c> is used to write a message to the screen.
-        /// </summary>
-        /// <param name="message">The message to write to the screen</param>
-        private void WriteMessage(string message)
-        {
-            if (!isServer)
-                return;
-            messageText.text = message;
-            RpcWriteMessage(message);
-        }
-        
-        /// <summary>
-        /// Method <c>RpcWriteMessage</c> is used to write a message to the screen on the client.
-        /// </summary>
-        /// <param name="message">The message to write to the screen</param>
-        [ClientRpc]
-        private void RpcWriteMessage(string message)
-        {
-            messageText.text = message;
         }
     }
 }

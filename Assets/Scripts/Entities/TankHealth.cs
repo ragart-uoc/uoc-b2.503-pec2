@@ -132,12 +132,18 @@ namespace PEC2.Entities
             m_CameraManager.UpdateTargetGroup();
         }
         
+        /// <summary>
+        /// Method <c>RpcExplode</c> is used to play the explosion on the client. 
+        /// </summary>
         [ClientRpc]
         private void RpcExplode()
         {
             OnExplode();
         }
 
+        /// <summary>
+        /// Method <c>OnExplode</c> is used to play the explosion.
+        /// </summary>
         private void OnExplode()
         {
             // Instantiate the explosion prefab and get a reference to the particle system on it.
