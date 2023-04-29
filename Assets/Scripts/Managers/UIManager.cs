@@ -73,7 +73,8 @@ namespace PEC2.Managers
         {
             if (!isServer)
                 return;
-            StartCoroutine(OnSendEvent(message, duration));
+            if (isServerOnly)
+                StartCoroutine(OnSendEvent(message, duration));
             RpcSendEvent(message, duration);
         }
         

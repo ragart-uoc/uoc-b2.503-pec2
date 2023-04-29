@@ -5,6 +5,7 @@ using TMPro;
 using PEC2.Managers;
 using PEC2.Utilities;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 
 namespace PEC2.Entities
 {
@@ -16,14 +17,14 @@ namespace PEC2.Entities
     {
         /// <value>Property <c>playerName</c> represents the name of the player.</value>
         [SyncVar(hook = "OnChangeName")]
-        public string playerName;
+        public string playerName = "Player";
         
         /// <value>Property <c>playerNameText</c> represents the text component of the player name.</value>
         public TextMeshProUGUI playerNameText;
         
         /// <value>Property <c>playerColor</c> represents the color of the player tank.</value>
         [SyncVar(hook = "OnChangeColor")]
-        public Color playerColor;
+        public Color playerColor = Color.blue;
 
         /// <value>Property <c>coloredPlayerName</c> represents the name of the player with the color tag.</value>
         [HideInInspector]
@@ -85,6 +86,8 @@ namespace PEC2.Entities
         /// </summary>
         private void Awake()
         {
+            m_EventsRegistrable = false;
+
             // Get the references to the spawn point
             var goTransform = transform;
             m_SpawnDirection = goTransform.position;
@@ -118,16 +121,21 @@ namespace PEC2.Entities
                 
             // Get player color from PlayerPrefs
             var playerColorString = PlayerPrefs.GetString("PlayerColor", "");
-
-            // Convert string to color
             var newPlayerColor = playerColorString.Split(',').Length == 3
                 ? ColorStrings.ColorFromString(playerColorString)
                 : Color.blue;
             SetColor(newPlayerColor);
             
-            // Update the player info for non-local players
+            // Dispatch the joined event
+            if (isLocalPlayer)
+            {
+                var newColoredPlayerName = GetColoredPlayerName(newPlayerName, newPlayerColor);
+                CmdSendLocalEvent(newColoredPlayerName + " joined the game", 2f);
+            }
+
+            // Update the player info for existing non-local players
             if (!isLocalPlayer)
-                OnChangeColoredPlayerName(coloredPlayerName, coloredPlayerName);
+                UpdatePlayerInfo(coloredPlayerName, "WINS: " + wins);
 
             // Refresh the group camera targets
             m_CameraManager.UpdateTargetGroup();
@@ -135,17 +143,8 @@ namespace PEC2.Entities
             // Disable controls depeding on the game state
             EnableControls(m_GameManager.controlsEnabled);
             
-            // Dispatch the event
+            // Enable event dispatching
             m_EventsRegistrable = true;
-            m_UIManager.SendEvent(coloredPlayerName + " joined the game", 2f);
-        }
-
-        /// <summary>
-        /// Method <c>OnDisable</c> is called when the behaviour becomes disabled.
-        /// </summary>
-        private void OnDisable()
-        {
-            m_UIManager.SendEvent(coloredPlayerName + " died", 2f);
         }
 
         /// <summary>
@@ -155,9 +154,6 @@ namespace PEC2.Entities
         {
             // Remove the player info
             Destroy(m_PlayerInfo.gameObject);
-            
-            // Dispatch the event
-            m_UIManager.SendEvent(coloredPlayerName + " has left the game", 2f);
         }
 
         /// <summary>
@@ -216,7 +212,9 @@ namespace PEC2.Entities
         public void CmdSetName(string newName)
         {
             playerName = newName;
-            OnChangeName(playerName, newName);
+            UpdateColoredPlayerName();
+            if (isServerOnly)
+                OnChangeName(playerName, newName);
         }
         
         /// <summary>
@@ -228,14 +226,6 @@ namespace PEC2.Entities
         {
             // Change the name of the player
             playerNameText.text = newName;
-
-            // Update the colored player name
-            var oldColoredPlayerName = coloredPlayerName;
-            UpdateColoredPlayerName();
-            
-            // Dispatch the event
-            if (m_UIManager != null && m_EventsRegistrable)
-                m_UIManager.SendEvent(oldColoredPlayerName + " changed name to " + coloredPlayerName, 2f);
         }
         
         /// <summary>
@@ -257,7 +247,9 @@ namespace PEC2.Entities
         public void CmdSetColor(Color newColor)
         {
             playerColor = newColor;
-            OnChangeColor(playerColor, newColor);
+            UpdateColoredPlayerName();
+            if (isServerOnly)
+                OnChangeColor(playerColor, newColor);
         }
         
         /// <summary>
@@ -279,35 +271,26 @@ namespace PEC2.Entities
             
             // Change the color of the player name
             playerNameText.color = newColor;
-            
-            // Update the colored player name
-            UpdateColoredPlayerName();
-            
-            // Dispatch the event
-            if (m_UIManager != null && m_EventsRegistrable)
-                m_UIManager.SendEvent(coloredPlayerName + " changed color", 2f);
         }
         
         /// <summary>
-        /// Method <c>UpdateColoredPlayerName</c> is used to update the colored player name.
+        /// Command <c>UpdateColoredPlayerName</c> is used to update the colored player name.
         /// </summary>
-        private void UpdateColoredPlayerName()
+        [Server]
+        public void UpdateColoredPlayerName()
         {
-            if (!isLocalPlayer)
-                return;
-            var newColoredPlayerName = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
-            CmdUpdateColoredPlayerName(newColoredPlayerName);
+            coloredPlayerName = GetColoredPlayerName(playerName, playerColor);
+            if (isServerOnly)
+                OnChangeColoredPlayerName(coloredPlayerName, coloredPlayerName);
         }
         
         /// <summary>
-        /// Command <c>CmdUpdateColoredPlayerName</c> is used to update the colored player name.
+        /// Method <c>GetColoredPlayerName</c> is used to get the colored player name.
         /// </summary>
-        /// <param name="newColoredPlayerName">The new colored player name.</param>
-        [Command]
-        public void CmdUpdateColoredPlayerName(string newColoredPlayerName)
+        /// <returns></returns>
+        public string GetColoredPlayerName(string thisName, Color thisColor)
         {
-            coloredPlayerName = "<color=#" + ColorUtility.ToHtmlStringRGB(playerColor) + ">" + playerName + "</color>";
-            OnChangeColoredPlayerName(coloredPlayerName, coloredPlayerName);
+            return "<color=#" + ColorUtility.ToHtmlStringRGB(thisColor) + ">" + thisName + "</color>";
         }
         
         /// <summary>
@@ -317,10 +300,11 @@ namespace PEC2.Entities
         /// <param name="newColoredPlayerName">The new colored player name.</param>
         public void OnChangeColoredPlayerName(string oldColoredPlayerName, string newColoredPlayerName)
         {
-            if (m_PlayerInfo == null)
-                return;
+            // Dispatch the event
+            if (oldColoredPlayerName != "")
+                SendLocalEvent(oldColoredPlayerName + " is now " + coloredPlayerName, 2f);
             // Change the name of the player info
-            m_PlayerInfoNameText.text = newColoredPlayerName;
+            UpdatePlayerInfo(coloredPlayerName);
         }
         
         /// <summary>
@@ -328,11 +312,22 @@ namespace PEC2.Entities
         /// </summary>
         public void OnChangeWins(int oldWins, int newWins)
         {
+            UpdatePlayerInfo(coloredPlayerName, "WINS: " + newWins);
+        }
+
+        /// <summary>
+        /// Method <c>UpdatePlayerInfo</c> is used to update the UI.
+        /// </summary>
+        /// <param name="nameText">The new name text.</param>
+        /// <param name="winsText">The new wins text.</param>
+        private void UpdatePlayerInfo(string nameText, string winsText = null)
+        {
             if (m_PlayerInfo == null)
                 return;
             // Update the UI
-            m_PlayerInfoNameText.text = coloredPlayerName;
-            m_PlayerInfoWinsText.text = "WINS: " + newWins;
+            m_PlayerInfoNameText.text = nameText;
+            if (winsText != null)
+                m_PlayerInfoWinsText.text = winsText;
         }
         
         /// <summary>
@@ -354,7 +349,8 @@ namespace PEC2.Entities
         public void CmdEnableControls(bool enable)
         {
             controlsEnabled = enable;
-            OnChangeControlsEnabled(controlsEnabled, enable);
+            if (isServerOnly)
+                OnChangeControlsEnabled(controlsEnabled, enable);
         }
 
         /// <summary>
@@ -365,6 +361,28 @@ namespace PEC2.Entities
         public void OnChangeControlsEnabled(bool oldControlsEnabled, bool newControlsEnabled)
         {
             gameObject.GetComponent<PlayerInput>().enabled = newControlsEnabled;
+        }
+        
+        /// <summary>
+        /// Method <c>SendLocalEvent</c> is used to send a local event to the UI.
+        /// </summary>
+        /// <param name="message">The message of the event.</param>
+        /// <param name="duration">The duration of the event.</param>
+        public void SendLocalEvent(string message, float duration)
+        {
+            if (m_UIManager != null && m_EventsRegistrable && isLocalPlayer)
+                CmdSendLocalEvent(message, duration);
+        }
+        
+        /// <summary>
+        /// Command <c>CmdSendLocalEvent</c> is used to send a local event to the UI.
+        /// </summary>
+        /// <param name="message">The message of the event.</param>
+        /// <param name="duration">The duration of the event.</param>
+        [Command]
+        public void CmdSendLocalEvent(string message, float duration)
+        {
+            m_UIManager.SendEvent(message, duration);
         }
     }
 }

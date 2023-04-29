@@ -33,6 +33,7 @@ namespace PEC2.Entities
         public GameObject explosionPrefab;
 
         /// <value>Property <c>m_Dead</c> represents whether or not the tank is currently dead.</value>
+        [SyncVar]
         private bool m_Dead;
         
         /// <value>Property <c>destroyOnDeath</c> represents whether or not the tank should be destroyed when it dies.</value>
@@ -109,11 +110,15 @@ namespace PEC2.Entities
         /// </summary>
         private void Die()
         {
+            if (!isServer)
+                return;
+            
             // Set the flag so that this function is only called once
             m_Dead = true;
             
             // Explode
-            OnExplode();
+            if (isServerOnly)
+                OnExplode();
             RpcExplode();
 
             // Destroy or disable the tank
@@ -122,7 +127,7 @@ namespace PEC2.Entities
                 Destroy(gameObject);
                 NetworkServer.Destroy(gameObject);
             }
-            else if (isServer)
+            else
             {
                 gameObject.SetActive(false);
                 RpcDisable();
