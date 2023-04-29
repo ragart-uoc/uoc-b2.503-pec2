@@ -148,9 +148,9 @@ namespace PEC2.Entities
         }
 
         /// <summary>
-        /// Method <c>OnStopClient</c> is called when the client stops.
+        /// Method <c>OnDestroy</c> is called when the MonoBehaviour will be destroyed.
         /// </summary>
-        public override void OnStopClient()
+        public void OnDestroy()
         {
             // Remove the player info
             Destroy(m_PlayerInfo.gameObject);

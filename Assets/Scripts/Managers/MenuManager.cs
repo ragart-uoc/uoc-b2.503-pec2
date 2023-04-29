@@ -80,6 +80,8 @@ namespace PEC2.Managers
         /// </summary>
         public void GoToMainMenu()
         {
+            if (NetworkClient.isConnected)
+                NetworkClient.Disconnect();
             SceneManager.LoadScene("MainMenu");
         }
 
@@ -88,6 +90,8 @@ namespace PEC2.Managers
         /// </summary>
         public void QuitGame()
         {
+            if (NetworkClient.isConnected)
+                NetworkClient.Disconnect();
             Application.Quit();
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
