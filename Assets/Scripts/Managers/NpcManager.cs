@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+
 using Random = UnityEngine.Random;
 
 namespace PEC2.Managers
@@ -37,9 +38,9 @@ namespace PEC2.Managers
         }
 
         /// <summary>
-        /// Method <c>OnStartServer</c> is invoked for NetworkBehaviour objects when they become active on the server.
+        /// Method <c>Spawn</c> is used to spawn enemies in the scene.
         /// </summary>
-        public override void OnStartServer() {
+        private void Spawn() {
             for (var i = 0; i < numberOfEnemies; i++) {
                 var spawnPosition = new Vector3(
                     Random.Range(-40.0f, 40.0f),
@@ -57,6 +58,26 @@ namespace PEC2.Managers
                 // Refresh the group camera targets
                 cameraManager.UpdateTargetGroup();
             }
+        }
+        
+        /// <summary>
+        /// Method <c>DeSpawn</c> is used to despawn enemies in the scene.
+        /// </summary>
+        public static void DeSpawn()
+        {
+            var enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (var enemy in enemies) {
+                NetworkServer.Destroy(enemy);
+            }
+        }
+
+        /// <summary>
+        /// Method <c>ReSpawn</c> is used to respawn enemies in the scene.
+        /// </summary>
+        public void ReSpawn()
+        {
+            DeSpawn();
+            Spawn();
         }
     }
 }

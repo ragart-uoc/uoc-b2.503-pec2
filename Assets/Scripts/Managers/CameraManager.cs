@@ -1,8 +1,8 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using Cinemachine;
 using Mirror;
-using Mirror.SimpleWeb;
 
 namespace PEC2.Managers
 {
@@ -54,18 +54,23 @@ namespace PEC2.Managers
         public void UpdateTargetGroup()
         {
             if (isServer)
+            {
+                OnChangeTargetGroup();
                 RpcUpdateTargetGroup();
+            }
             else if (isLocalPlayer)
+            {
                 CmdUpdateTargetGroup();
-                
+            }
         }
         
         /// <summary>
         /// Command <c>CmdUpdateTargetGroup</c> updates the group camera targets.
         /// </summary>
         [Command]
-        public void CmdUpdateTargetGroup()
+        private void CmdUpdateTargetGroup()
         {
+            OnChangeTargetGroup();
             RpcUpdateTargetGroup();
         }
 
@@ -73,7 +78,7 @@ namespace PEC2.Managers
         /// Method <c>RpcUpdateTargetGroup</c> updates the group camera targets.
         /// </summary>
         [ClientRpc]
-        public void RpcUpdateTargetGroup()
+        private void RpcUpdateTargetGroup()
         {
             OnChangeTargetGroup();
         }
@@ -86,15 +91,19 @@ namespace PEC2.Managers
             // Clear all targets from the group camera
             groupTargetCamera.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
             
+            // Get entities from either the network server or the network client
+            var entities = isServer ? NetworkServer.spawned.Values : NetworkClient.spawned.Values;
+            
+            // Filter only entities with the tag "Player" or "Enemy" and that are active
+            var filteredEntities = entities
+                .Where(e=> e.gameObject.CompareTag("Player") || e.gameObject.CompareTag("Enemy"))
+                .Where(e=> e.gameObject.activeSelf);
+            
             // Loop through all spawned entities
-            foreach (var entity in NetworkClient.spawned.Values)
+            foreach (var entity in filteredEntities)
             {
-                // Check if the entity has either the player or the enemy tag
-                if (entity.CompareTag("Player") || entity.CompareTag("Enemy"))
-                {
-                    // Add the entity to the group camera
-                    AddTargetToGroupCamera(entity.gameObject);
-                }
+                // Add the entity to the group camera
+                AddTargetToGroupCamera(entity.gameObject);
             }
         }
         

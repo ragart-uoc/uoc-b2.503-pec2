@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 using Mirror;
 
 namespace PEC2.Entities
@@ -10,14 +9,12 @@ namespace PEC2.Entities
     public class TankShooting : NetworkBehaviour
     {
         /// <value>Property <c>shell</c> represents the prefab of the shell.</value>
-        [FormerlySerializedAs("m_Shell")]
         public Rigidbody shell;
         
         /// <value>Property <c>altShell</c> represents the prefab of the alt shell.</value>
         public Rigidbody altShell;
 
         /// <value>Property <c>fireTransform</c> represents the child of the tank where the shells are spawned.</value>
-        [FormerlySerializedAs("m_FireTransform")]
         public Transform fireTransform;
 
         /// <summary>
