@@ -63,12 +63,6 @@ namespace PEC2
         public void PlayerModeAction(){
             MenuButtons.SetActive(false);
             PlayerPanel.SetActive(true);
-            
-            // Comienza Network Discovery
-            Debug.Log("Actualizando servidores...");
-            discoveredServers.Clear();
-            networkDiscovery.StartDiscovery();
-            DiscoveredGamesList = new List<DiscoveredGame>();
         }
 
         public void CreateDedicatedServerAction(){
@@ -81,15 +75,26 @@ namespace PEC2
             }
         }
 
-        public void UpdateServersAction(){
-            // Borramos la lista antigua
-            if(DiscoveredGamesList.Count > 0){
-                foreach(DiscoveredGame discoveredGame in DiscoveredGamesList){
-                    Destroy(discoveredGame.banner);
-                }
-                DiscoveredGamesList.Clear();
-            }
+        IEnumerator WeWaitForServersAndUpdate(){
+            
+            // Comienza Network Discovery
+            //Debug.Log("Actualizando servidores...");
+            discoveredServers.Clear();
+            networkDiscovery.StartDiscovery();
 
+            // Borramos la lista antigua
+            if(DiscoveredGamesList != null){
+                if(DiscoveredGamesList.Count > 0){
+                    foreach(DiscoveredGame discoveredGame in DiscoveredGamesList){
+                        Destroy(discoveredGame.banner);
+                    }
+                    DiscoveredGamesList.Clear();
+                }
+            }else{
+                DiscoveredGamesList = new List<DiscoveredGame>();
+            }
+            // Damos tiempo para que descubra los servidores
+            yield return new WaitForSeconds(0.25f);
             // Generamos la lista nueva
             int i = 0;
             foreach (ServerResponse info in discoveredServers.Values)
@@ -108,9 +113,29 @@ namespace PEC2
                 texto.SetText(discoveredGame.address.EndPoint.Address.ToString());
 
                 DiscoveredGamesList.Add(discoveredGame);
+                    Debug.Log(" ---------> Added");
                 i++;
             }
-            Debug.Log(" -> " + i + " servidores encontrados!");
+            //Debug.Log(" -> " + i + " servidores encontrados!");
+            networkDiscovery.StopDiscovery();
+        }
+
+        public void UpdateServersAction(){
+            StartCoroutine(WeWaitForServersAndUpdate());
+        }
+
+        public void CloseGameAction(){
+            Application.Quit();
+        }
+
+        public void GoBackToPage0ServerAction(){
+            ServerPanel.SetActive(false);
+            MenuButtons.SetActive(true);
+        }
+
+        public void GoBackToPage0PlayerAction(){
+            PlayerPanel.SetActive(false);
+            MenuButtons.SetActive(true);
         }
 
         // We save Player Name and Color
@@ -120,7 +145,7 @@ namespace PEC2
             if(NameText != null && !NameText.Trim().Equals("")){
                 // Playerprefs Name
                 PlayerPrefs.SetString("PlayerName", NameText);
-                Debug.Log("Playerprefs name: " + NameText);
+                //Debug.Log("Playerprefs name: " + NameText);
             }
             // Save Color
             TMPro.TMP_Dropdown dropdown = PlayerColorInput.GetComponent<TMPro.TMP_Dropdown>();
@@ -130,7 +155,7 @@ namespace PEC2
                 if(!ActualColorString.Equals("")){
                     // Playerprefs Color
                     PlayerPrefs.SetString("PlayerColor", ActualColorString);
-                    Debug.Log("Playerprefs color: " + ActualColorString);
+                    //Debug.Log("Playerprefs color: " + ActualColorString);
                 }
             }
         }
@@ -155,7 +180,7 @@ namespace PEC2
         }
 
         public void CreateGame(){
-            Debug.Log(" -> Crear partida");
+            //Debug.Log(" -> Crear partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
                     SaveSettings();
@@ -167,7 +192,7 @@ namespace PEC2
         }
 
         public void JoinGame(){
-            Debug.Log(" -> Unirse a partida");
+            //Debug.Log(" -> Unirse a partida");
             if(!NetworkClient.isConnected && !NetworkServer.active){
                 if(!NetworkClient.active){
                     SaveSettings();
@@ -181,7 +206,7 @@ namespace PEC2
         {
             // Note that you can check the versioning to decide if you can connect to the server or not using this method
             discoveredServers[info.serverId] = info;
-            Debug.Log("Server Discovered!");
+            //Debug.Log("Server Discovered!");
         }
     }
 }
