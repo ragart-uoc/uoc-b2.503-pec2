@@ -83,6 +83,8 @@ namespace PEC2.Entities
             
             // Reduce current health by the amount of damage done
             currentHealth -= amount;
+            if (isServerOnly)
+                OnChangeHealth(currentHealth, currentHealth);
 
             // If the current health is at or below zero and it has not yet been registered, call OnDeath
             if (!(currentHealth <= 0f) || m_Dead)
