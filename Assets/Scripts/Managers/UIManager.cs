@@ -104,9 +104,9 @@ namespace PEC2.Managers
         public void GoToMainMenu()
         {
             if (isClient && NetworkClient.isConnected)
-                NetworkClient.Shutdown();
+                NetworkManager.singleton.StopClient();
             if (isServer && NetworkServer.active)
-                NetworkServer.Shutdown();
+                NetworkManager.singleton.StopServer();
             SceneManager.LoadScene("MainMenu");
         }
 
@@ -115,10 +115,6 @@ namespace PEC2.Managers
         /// </summary>
         public void QuitGame()
         {
-            if (isClient && NetworkClient.isConnected)
-                NetworkClient.Shutdown();
-            if (isServer && NetworkServer.active)
-                NetworkServer.Shutdown();
             Application.Quit();
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;

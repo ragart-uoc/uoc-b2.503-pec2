@@ -89,13 +89,11 @@ namespace PEC2.UI
         #if UNITY_EDITOR
         private void OnValidate()
         {
-            /*
             if (m_NetworkDiscovery != null)
                 return;
-            m_NetworkDiscovery = GetComponent<NetworkDiscovery>();
+            m_NetworkDiscovery = GameObject.Find("NetworkManager").GetComponent<NetworkDiscovery>();
             UnityEditor.Events.UnityEventTools.AddPersistentListener(m_NetworkDiscovery.OnServerFound, OnDiscoveredServer);
             UnityEditor.Undo.RecordObjects(new Object[] { this, m_NetworkDiscovery }, "Set NetworkDiscovery");
-            */
         }
         #endif
 
@@ -122,9 +120,6 @@ namespace PEC2.UI
         /// </summary>
         public void CreateDedicatedServerAction()
         {
-            Debug.Log("NetworkServer.active: " + NetworkServer.active);
-            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
-            Debug.Log("NetworkClient.active: " + NetworkClient.active);
             if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
                 return;
             m_DiscoveredServers.Clear();
@@ -272,9 +267,6 @@ namespace PEC2.UI
         /// </summary>
         public void CreateGame()
         {
-            Debug.Log("NetworkServer.active: " + NetworkServer.active);
-            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
-            Debug.Log("NetworkClient.active: " + NetworkClient.active);
             if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
                 return;
             SaveSettings();
@@ -288,9 +280,6 @@ namespace PEC2.UI
         /// </summary>
         public void JoinGame()
         {
-            Debug.Log("NetworkServer.active: " + NetworkServer.active);
-            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
-            Debug.Log("NetworkClient.active: " + NetworkClient.active);
             if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
                 return;
             SaveSettings();
