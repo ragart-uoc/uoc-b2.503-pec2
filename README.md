@@ -43,12 +43,14 @@ Al iniciar la partida, el jugador puede elegir entre:
 
 ## Controles
 
-| Acción | Tecla |
-| --- | --- |
-| Moverse hacia delante | Flecha arriba |
-| Moverse hacia atrás | Flecha abajo |
-| Girar hacia la izquierda | Flecha izquierda |
-| Girar hacia la derecha | Flecha derecha |
-| Disparar proyectil normal | Barra espaciadora |
+Los controles que se detallan a continuación son únicamente para el modo cliente.
+
+| Acción                         | Tecla |
+|--------------------------------| --- |
+| Moverse hacia delante          | Flecha arriba |
+| Moverse hacia atrás            | Flecha abajo |
+| Girar hacia la izquierda       | Flecha izquierda |
+| Girar hacia la derecha         | Flecha derecha |
+| Disparar proyectil normal      | Barra espaciadora |
 | Disparar proyectil alternativo | Control izquierdo |
-| Pausar | Escape |
+| Menú           | Escape |
