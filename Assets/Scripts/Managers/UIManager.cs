@@ -43,7 +43,6 @@ namespace PEC2.Managers
                 Destroy(gameObject);
                 return;
             }
-
             _instance = this;
         }
 
@@ -52,6 +51,7 @@ namespace PEC2.Managers
         /// </summary>
         private void Start()
         {
+            messageText.text = String.Empty;
             if (isServerOnly)
                 serverMenu.SetActive(true);
         }
