@@ -27,7 +27,7 @@ namespace PEC2.Managers
         public float endDelay = 3f;
         
         /// <value>Property <c>controlsEnabled</c> is used to check if the controls are enabled.</value>
-        [SyncVar(hook = "OnChangeControlsEnabled")]
+        [SyncVar]
         public bool controlsEnabled;
         
         /// <value>Property <c>uiManager</c> is a reference to the UI manager.</value>
@@ -157,7 +157,7 @@ namespace PEC2.Managers
                 yield break;
 
             // Stop tanks from moving
-            controlsEnabled = false;
+            EnableControls(false);
             
             // Start off by running the 'GameStarting' coroutine but don't return until it's finished
             yield return StartCoroutine(GameStarting());
@@ -176,7 +176,7 @@ namespace PEC2.Managers
             {
                 m_GameStarted = false;
                 yield return new WaitForSeconds(3f);
-                NetworkServer.DisconnectAll();
+                NetworkManager.singleton.StopServer();
                 SceneManager.LoadScene("MainMenu");
             }
             else
@@ -240,7 +240,7 @@ namespace PEC2.Managers
                 yield break;
 
             // As soon as the round begins playing let the players control the tanks
-            controlsEnabled = true;
+            EnableControls(true);
 
             // Clear the text from the screen
             uiManager.WriteMessage(string.Empty);
@@ -262,7 +262,7 @@ namespace PEC2.Managers
                 yield break;
 
             // Stop tanks from moving
-            controlsEnabled = false;
+            EnableControls(false);
 
             // Clear the winner from the previous round
             m_RoundWinner = null;
@@ -350,7 +350,7 @@ namespace PEC2.Managers
         }
         
         /// <summary>
-        /// Method <b>ResetAllTanks</b> is used to reset all tanks in the game.
+        /// Method <b>RespawnTanks</b> is used to respawn all tanks in the game.
         /// </summary>
         private void RespawnTanks()
         {
@@ -363,12 +363,12 @@ namespace PEC2.Managers
         }
         
         /// <summary>
-        /// Method <c>OnChangeControlsEnabled</c> is called when the controlsEnabled property is changed.
+        /// Method <c>EnableControls</c> is used to enable or disable the controls of all tanks.
         /// </summary>
-        /// <param name="oldControlsEnabled">The old value of the controlsEnabled property</param>
         /// <param name="newControlsEnabled">The new value of the controlsEnabled property</param>
-        public void OnChangeControlsEnabled(bool oldControlsEnabled, bool newControlsEnabled)
+        private void EnableControls(bool newControlsEnabled)
         {
+            controlsEnabled = newControlsEnabled;
             var players = GetAllPlayers();
             foreach (var player in players)
             {
@@ -393,7 +393,7 @@ namespace PEC2.Managers
         {
             // Get all connections with tag Player
             var players = NetworkServer.connections.Values
-                .Where(c => c != null)
+                .Where(c => c != null && c.identity != null)
                 .Select(c => c.identity.gameObject)
                 .Where(p => p.CompareTag("Player"))
                 .ToList();
@@ -407,7 +407,7 @@ namespace PEC2.Managers
         private List<GameObject> GetAlivePlayers()
         {
             var players = NetworkServer.connections.Values
-                .Where(c => c != null)
+                .Where(c => c != null && c.identity != null)
                 .Select(c => c.identity.gameObject)
                 .Where(p => p.CompareTag("Player") && p.activeSelf)
                 .ToList();

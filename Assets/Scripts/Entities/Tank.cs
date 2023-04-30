@@ -5,7 +5,6 @@ using TMPro;
 using PEC2.Managers;
 using PEC2.Utilities;
 using UnityEngine.InputSystem;
-using UnityEngine.PlayerLoop;
 
 namespace PEC2.Entities
 {
@@ -41,12 +40,14 @@ namespace PEC2.Entities
         
         /// <value>Property <c>m_Rigidbody</c> represents the rigidbody of the tank.</value>
         private Rigidbody m_Rigidbody;
-        
-        /// <value>Property <c>m_SpawnDirection</c> represents the direction the tank will face when it spawns.</value>
-        private Vector3 m_SpawnDirection;
 
-        /// <value>Property <c>m_SpawnRotation</c> represents the rotation the tank will have when it spawns.</value>
-        private Quaternion m_SpawnRotation;
+        /// <value>Property <c>spawnPosition</c> represents the spawn position of the tank.</value>
+        [SyncVar]
+        public Vector3 spawnPosition;
+        
+        /// <value>Property <c>spawnRotation</c> represents the spawn rotation of the tank.</value>
+        [SyncVar]
+        public Quaternion spawnRotation;
         
         /// <value>Property <c>m_TankHealth</c> represents the tank health.</value>
         private TankHealth m_TankHealth;
@@ -87,11 +88,6 @@ namespace PEC2.Entities
         private void Awake()
         {
             m_EventsRegistrable = false;
-
-            // Get the references to the spawn point
-            var goTransform = transform;
-            m_SpawnDirection = goTransform.position;
-            m_SpawnRotation = goTransform.rotation;
             
             // Get the rigidbody
             m_Rigidbody = GetComponent<Rigidbody>();
@@ -108,6 +104,11 @@ namespace PEC2.Entities
             m_CameraManager = GameObject.Find("CameraManager").GetComponent<CameraManager>();
             m_TankHealth = GetComponent<TankHealth>();
             
+            // Get the spawn point
+            var goTransform = transform;
+            spawnPosition = goTransform.position;
+            spawnRotation = goTransform.rotation;
+
             // Create the player info
             m_PlayersInfoPanel = GameObject.Find("PlayersInfo");
             m_PlayerInfo = Instantiate(playerInfoPrefab, m_PlayersInfoPanel.transform);
@@ -163,32 +164,40 @@ namespace PEC2.Entities
         {
             if (!isServer)
                 return;
-            OnRespawn();
-            RpcRespawn();
+            RpcRespawn(spawnPosition, spawnRotation);
+            if (isServerOnly)
+                OnRespawn(spawnPosition, spawnRotation);
         }
 
         /// <summary>
         /// Method <c>OnRespawn</c> is used to respawn the tank.
         /// </summary>
         [ClientRpc]
-        public void RpcRespawn()
+        public void RpcRespawn(Vector3 position, Quaternion rotation)
         {
-            OnRespawn(); 
+            OnRespawn(position, rotation); 
         }
         
         /// <summary>
         /// Method <c>OnRespawn</c> is used to respawn the tank.
         /// </summary>
-        public void OnRespawn()
+        public void OnRespawn(Vector3 position, Quaternion rotation)
         {
-            // Ensure the game object is disabled
+            // Ensure that the tank is disabled
             gameObject.SetActive(false);
-            
+
+            // Reset the tank velocity
+            m_Rigidbody.velocity = Vector3.zero;
+            m_Rigidbody.angularVelocity = Vector3.zero;
+
             // Reset the position and rotation
             var goTransform = transform;
-            goTransform.position = m_SpawnDirection;
-            goTransform.rotation = m_SpawnRotation;
+            goTransform.position = position;
+            goTransform.rotation = rotation;
 
+            // Refresh the group camera targets
+            m_CameraManager.UpdateTargetGroup();
+            
             // Enable the gameobject
             gameObject.SetActive(true);
         }
