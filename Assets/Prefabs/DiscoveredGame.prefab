@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 867760426860397302}
   - component: {fileID: 867760426860397303}
   m_Layer: 5
-  m_Name: PartidaEncontradaItem
+  m_Name: DiscoveredGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

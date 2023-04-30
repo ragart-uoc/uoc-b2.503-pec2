@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -222,7 +222,7 @@ RectTransform:
   - {fileID: 137082643}
   - {fileID: 1575966037}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -241,17 +241,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4625727d3b9b08d4ca167ebd09e6f551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkDiscovery: {fileID: 487876116}
   serverIP: localhost
-  MenuButtons: {fileID: 1134756351}
-  ServerPanel: {fileID: 137082642}
-  PlayerPanel: {fileID: 1575966036}
-  DiscoveredGamesPanel: {fileID: 922323158}
-  DiscoveredGamePrefab: {fileID: 867760426860397305, guid: 64ff89840d1ec764ba7740487d88ad11,
+  menuButtons: {fileID: 1134756351}
+  serverPanel: {fileID: 137082642}
+  playerPanel: {fileID: 1575966036}
+  discoveredGamesPanel: {fileID: 922323158}
+  discoveredGamePrefab: {fileID: 867760426860397305, guid: 64ff89840d1ec764ba7740487d88ad11,
     type: 3}
-  RefreshServersButton: {fileID: 442958751}
-  PlayerNameInput: {fileID: 373019560}
-  PlayerColorInput: {fileID: 1486889453}
+  playerNameInput: {fileID: 373019560}
+  playerColorInput: {fileID: 1486889453}
 --- !u!114 &41287231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -910,7 +908,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &224549648
 MonoBehaviour:
@@ -1958,152 +1956,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.9768, y: -24}
   m_SizeDelta: {x: 285.6028, y: 36.5044}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &487876111
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 487876113}
-  - component: {fileID: 487876112}
-  - component: {fileID: 487876114}
-  - component: {fileID: 487876116}
-  - component: {fileID: 487876115}
-  m_Layer: 0
-  m_Name: NetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &487876112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487876111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  autoStartServerBuild: 1
-  autoConnectClientBuild: 0
-  sendRate: 30
-  offlineScene: Assets/Scenes/MainMenu.unity
-  onlineScene: Assets/Scenes/Game.unity
-  transport: {fileID: 487876114}
-  networkAddress: localhost
-  maxConnections: 4
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 173472, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
-  autoCreatePlayer: 1
-  playerSpawnMethod: 1
-  spawnPrefabs:
-  - {fileID: 173472, guid: 073142167189e8c478cae2ff49389ef4, type: 3}
-  - {fileID: 192454, guid: 008ecb1b70bec724fa2cd34255b0d8f8, type: 3}
-  - {fileID: 1009293826399480, guid: 6e92e934454dc4560bd201eac495b1aa, type: 3}
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  timeInterpolationGui: 0
---- !u!4 &487876113
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487876111}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &487876114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487876111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  port: 7777
-  NoDelay: 1
-  SendTimeout: 5000
-  ReceiveTimeout: 30000
-  serverMaxMessageSize: 16384
-  serverMaxReceivesPerTick: 10000
-  serverSendQueueLimitPerConnection: 10000
-  serverReceiveQueueLimitPerConnection: 10000
-  clientMaxMessageSize: 16384
-  clientMaxReceivesPerTick: 1000
-  clientSendQueueLimit: 10000
-  clientReceiveQueueLimit: 10000
---- !u!114 &487876115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487876111}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88c37d3deca7a834d80cfd8d3cfcc510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkDiscovery: {fileID: 487876116}
---- !u!114 &487876116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487876111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c761308e733c51245b2e8bb4201f46dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableActiveDiscovery: 1
-  BroadcastAddress: 
-  serverBroadcastListenPort: 47777
-  ActiveDiscoveryInterval: 3
-  transport: {fileID: 487876114}
-  OnServerFound:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 41287230}
-        m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: OnDiscoveredServer
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  secretHandshake: 3793729490873490341
 --- !u!1 &507328335
 GameObject:
   m_ObjectHideFlags: 0
@@ -2614,8 +2466,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 41287230}
-        m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: GoBackToPage0PlayerAction
+        m_TargetAssemblyTypeName: PEC2.UI.MenuInterfaceController, Assembly-CSharp
+        m_MethodName: TooglePlayerMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2694,7 +2546,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1134756352}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2832,7 +2684,7 @@ RectTransform:
   m_Children:
   - {fileID: 1716565923}
   m_Father: {fileID: 1134756352}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2884,8 +2736,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 41287230}
-        m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: ServerModeAction
+        m_TargetAssemblyTypeName: PEC2.UI.MenuInterfaceController, Assembly-CSharp
+        m_MethodName: ToggleServerMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3080,7 +2932,7 @@ GameObject:
   - component: {fileID: 720669498}
   - component: {fileID: 720669497}
   m_Layer: 5
-  m_Name: Text
+  m_Name: PlayerModeButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3722,8 +3574,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 41287230}
-        m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: GoBackToPage0ServerAction
+        m_TargetAssemblyTypeName: PEC2.UI.MenuInterfaceController, Assembly-CSharp
+        m_MethodName: ToggleServerMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4330,7 +4182,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1134756352
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4343,18 +4195,18 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 611084351}
   - {fileID: 709882740}
   - {fileID: 1794404717}
-  - {fileID: 611084351}
   - {fileID: 581620286}
   - {fileID: 219504210}
   m_Father: {fileID: 41287228}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000041962, y: -0.00098801}
-  m_SizeDelta: {x: 1280, y: 720.17}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1198681893
 GameObject:
@@ -4858,7 +4710,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1575966037
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5208,7 +5060,7 @@ GameObject:
   - component: {fileID: 1716565925}
   - component: {fileID: 1716565924}
   m_Layer: 5
-  m_Name: Text
+  m_Name: ServerModeButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5445,7 +5297,7 @@ RectTransform:
   m_Children:
   - {fileID: 720669496}
   m_Father: {fileID: 1134756352}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5497,8 +5349,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 41287230}
-        m_TargetAssemblyTypeName: PEC2.MenuInterfaceController, Assembly-CSharp
-        m_MethodName: PlayerModeAction
+        m_TargetAssemblyTypeName: PEC2.UI.MenuInterfaceController, Assembly-CSharp
+        m_MethodName: TooglePlayerMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -1,211 +1,311 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 using Mirror.Discovery;
-using UnityEngine.UI;
+using TMPro;
+using PEC2.Entities;
+using PEC2.Utilities;
 
-namespace PEC2
+namespace PEC2.UI
 {
+    /// <summary>
+    /// Class <c>MenuInterfaceController</c> controls the UI of the game.
+    /// </summary>
     public class MenuInterfaceController : MonoBehaviour
     {
+        /// <summary>
+        /// Property <c>m_DiscoveredServers</c> represents the list of discovered servers.
+        /// </summary>
+        private readonly Dictionary<long, ServerResponse> m_DiscoveredServers = new Dictionary<long, ServerResponse>();
+        
+        /// <summary>
+        /// Property <c>networkDiscovery</c> represents the network discovery.
+        /// </summary>
+        private NetworkDiscovery m_NetworkDiscovery;
 
-        public class DiscoveredGame{
-            public ServerResponse address{get; set;}
-            public GameObject banner{get; set;}
-        }
+        /// <summary>
+        /// Property <c>m_DiscoveredGamesList</c> represents the list of discovered games.
+        /// </summary>
+        private List<DiscoveredGame> m_DiscoveredGamesList;
 
-        readonly Dictionary<long, ServerResponse> discoveredServers = new Dictionary<long, ServerResponse>();
-        Vector2 scrollViewPos = Vector2.zero;
-        public NetworkDiscovery networkDiscovery;
-
-        // Listado de partidas encontradas
-        private List<DiscoveredGame> DiscoveredGamesList;
-
-        // Para jugar en LAN, especificar IP del servidor
+        /// <summary>
+        /// Property <c>serverIP</c> represents the IP of the server.
+        /// </summary>
         public string serverIP = "localhost";
 
-        // Inspector objects
+        #region InspectorObjects
 
-        public GameObject MenuButtons;
+            /// <summary>
+            /// Property <c>menuButtons</c> represents the menu buttons.
+            /// </summary>
+            public GameObject menuButtons;
 
-        public GameObject ServerPanel;
+            /// <summary>
+            /// Property <c>serverPanel</c> represents the server panel.
+            /// </summary>
+            public GameObject serverPanel;
 
-        public GameObject PlayerPanel;
+            /// <summary>
+            /// Property <c>playerPanel</c> represents the player panel.
+            /// </summary>
+            public GameObject playerPanel;
 
-        public GameObject DiscoveredGamesPanel;
+            /// <summary>
+            /// Property <c>discoveredGamesPanel</c> represents the discovered games panel.
+            /// </summary>
+            public GameObject discoveredGamesPanel;
 
-        public GameObject DiscoveredGamePrefab;
+            /// <summary>
+            /// Property <c>discoveredGamePrefab</c> represents the discovered game prefab.
+            /// </summary>
+            public GameObject discoveredGamePrefab;
 
-        public GameObject RefreshServersButton;
+            /// <summary>
+            /// Property <c>playerNameInput</c> represents the player name input.
+            /// </summary>
+            public GameObject playerNameInput;
 
-        public GameObject PlayerNameInput;
+            /// <summary>
+            /// Property <c>playerColorInput</c> represents the player color input.
+            /// </summary>
+            public GameObject playerColorInput;
+        
+        #endregion
 
-        public GameObject PlayerColorInput;
-
-#if UNITY_EDITOR
-        void OnValidate()
+        /// <summary>
+        /// Method <c>Start</c> is called before the first frame update.
+        /// </summary>
+        private void Start()
         {
-            if (networkDiscovery == null)
-            {
-                networkDiscovery = GetComponent<NetworkDiscovery>();
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(networkDiscovery.OnServerFound, OnDiscoveredServer);
-                UnityEditor.Undo.RecordObjects(new Object[] { this, networkDiscovery }, "Set NetworkDiscovery");
-            }
-        }
-#endif
-
-        public void ServerModeAction(){
-            MenuButtons.SetActive(false);
-            ServerPanel.SetActive(true);
+            // Get the network discovery
+            m_NetworkDiscovery = GameObject.Find("NetworkManager").GetComponent<NetworkDiscovery>();
         }
 
-        public void PlayerModeAction(){
-            MenuButtons.SetActive(false);
-            PlayerPanel.SetActive(true);
+        /// <summary>
+        /// Method <c>OnValidate</c> is called when the script is loaded or a value is changed in the inspector.
+        /// </summary>
+        #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            /*
+            if (m_NetworkDiscovery != null)
+                return;
+            m_NetworkDiscovery = GetComponent<NetworkDiscovery>();
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(m_NetworkDiscovery.OnServerFound, OnDiscoveredServer);
+            UnityEditor.Undo.RecordObjects(new Object[] { this, m_NetworkDiscovery }, "Set NetworkDiscovery");
+            */
+        }
+        #endif
+
+        /// <summary>
+        /// Method <c>ToggleServerMode</c> is called when entering or leaving server mode.
+        /// </summary>
+        public void ToggleServerMode()
+        {
+            serverPanel.SetActive(!serverPanel.activeSelf);
+            menuButtons.SetActive(!menuButtons.activeSelf);
         }
 
-        public void CreateDedicatedServerAction(){
-            if (!NetworkClient.isConnected && !NetworkServer.active) {
-                if (!NetworkClient.active) {
-                    discoveredServers.Clear();
-                    NetworkManager.singleton.StartServer();
-                    networkDiscovery.AdvertiseServer();
-                }
-            }
+        /// <summary>
+        /// Method <c>TooglePlayerMode</c> is called when entering or leaving player mode.
+        /// </summary>
+        public void TooglePlayerMode()
+        {
+            playerPanel.SetActive(!playerPanel.activeSelf);
+            menuButtons.SetActive(!menuButtons.activeSelf);
         }
 
-        IEnumerator WeWaitForServersAndUpdate(){
+        /// <summary>
+        /// Method <c>CreateDedicatedServerAction</c> is called when the create dedicated server button is pressed.
+        /// </summary>
+        public void CreateDedicatedServerAction()
+        {
+            Debug.Log("NetworkServer.active: " + NetworkServer.active);
+            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
+            Debug.Log("NetworkClient.active: " + NetworkClient.active);
+            if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
+                return;
+            m_DiscoveredServers.Clear();
+            NetworkManager.singleton.StartServer();
+            m_NetworkDiscovery.AdvertiseServer();
+        }
+
+        /// <summary>
+        /// Method <c>WaitForServersAndUpdate</c> is called when the wait for servers and update button is pressed.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator WeWaitForServersAndUpdate(){
             
-            // Comienza Network Discovery
-            //Debug.Log("Actualizando servidores...");
-            discoveredServers.Clear();
-            networkDiscovery.StartDiscovery();
+            // Network Discovery starts
+            // Debug.Log("Updating servers...");
+            m_DiscoveredServers.Clear();
+            m_NetworkDiscovery.StartDiscovery();
 
-            // Borramos la lista antigua
-            if(DiscoveredGamesList != null){
-                if(DiscoveredGamesList.Count > 0){
-                    foreach(DiscoveredGame discoveredGame in DiscoveredGamesList){
+            // Delete the old list
+            if (m_DiscoveredGamesList != null)
+            {
+                if (m_DiscoveredGamesList.Count > 0)
+                {
+                    foreach (var discoveredGame in m_DiscoveredGamesList)
+                    {
                         Destroy(discoveredGame.banner);
                     }
-                    DiscoveredGamesList.Clear();
+                    m_DiscoveredGamesList.Clear();
                 }
-            }else{
-                DiscoveredGamesList = new List<DiscoveredGame>();
             }
-            // Damos tiempo para que descubra los servidores
-            yield return new WaitForSeconds(0.25f);
-            // Generamos la lista nueva
-            int i = 0;
-            foreach (ServerResponse info in discoveredServers.Values)
+            else
             {
-                DiscoveredGame discoveredGame = new DiscoveredGame();
-                discoveredGame.banner = Instantiate(DiscoveredGamePrefab);
-                discoveredGame.banner.transform.SetParent(DiscoveredGamesPanel.transform, false);
-                RectTransform rectTransform = discoveredGame.banner.GetComponent<RectTransform>();
-                rectTransform.Translate(0, -60*i, 0);
+                m_DiscoveredGamesList = new List<DiscoveredGame>();
+            }
+            
+            // Give some time to discover the servers
+            yield return new WaitForSeconds(0.25f);
+            
+            // Generate the new list
+            var i = 0;
+            foreach (var info in m_DiscoveredServers.Values)
+            {
+                var discoveredGame = new DiscoveredGame
+                {
+                    banner = Instantiate(discoveredGamePrefab)
+                };
+                discoveredGame.banner.transform.SetParent(discoveredGamesPanel.transform, false);
+                
+                var rectTransform = discoveredGame.banner.GetComponent<RectTransform>();
+                rectTransform.Translate(0, -60 * i, 0);
                 discoveredGame.address = info;
 
-                Button button = discoveredGame.banner.GetComponentInChildren<Button>();
+                var button = discoveredGame.banner.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate {JoinServer(discoveredGame.address);});
 
-                TMPro.TextMeshProUGUI texto = discoveredGame.banner.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                texto.SetText(discoveredGame.address.EndPoint.Address.ToString());
+                var text = discoveredGame.banner.GetComponentInChildren<TextMeshProUGUI>();
+                text.SetText(discoveredGame.address.EndPoint.Address.ToString());
 
-                DiscoveredGamesList.Add(discoveredGame);
-                    Debug.Log(" ---------> Added");
+                m_DiscoveredGamesList.Add(discoveredGame);
+                Debug.Log(" ---------> Added");
                 i++;
             }
-            //Debug.Log(" -> " + i + " servidores encontrados!");
-            networkDiscovery.StopDiscovery();
+            //Debug.Log(" -> " + i + " servers found!");
+            m_NetworkDiscovery.StopDiscovery();
         }
 
-        public void UpdateServersAction(){
+        /// <summary>
+        /// Method <c>UpdateServersAction</c> is called when the update servers button is pressed.
+        /// </summary>
+        public void UpdateServersAction()
+        {
             StartCoroutine(WeWaitForServersAndUpdate());
         }
 
-        public void CloseGameAction(){
+        /// <summary>
+        /// Method <c>CloseGameAction</c> is called when the close game button is pressed.
+        /// </summary>
+        public void CloseGameAction()
+        {
             Application.Quit();
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #endif
         }
 
-        public void GoBackToPage0ServerAction(){
-            ServerPanel.SetActive(false);
-            MenuButtons.SetActive(true);
-        }
-
-        public void GoBackToPage0PlayerAction(){
-            PlayerPanel.SetActive(false);
-            MenuButtons.SetActive(true);
-        }
-
-        // We save Player Name and Color
-        private void SaveSettings(){
+        /// <summary>
+        /// Method <c>SaveSettings</c> is used to save the settings of the player.
+        /// </summary>
+        private void SaveSettings()
+        {
             // Save Name
-            string NameText = PlayerNameInput.GetComponent<TMPro.TMP_InputField>().text;
-            if(NameText != null && !NameText.Trim().Equals("")){
+            var nameText = playerNameInput.GetComponent<TMP_InputField>().text;
+            if (nameText != null && nameText.Trim() != "")
+            {
                 // Playerprefs Name
-                PlayerPrefs.SetString("PlayerName", NameText);
+                PlayerPrefs.SetString("PlayerName", nameText);
                 //Debug.Log("Playerprefs name: " + NameText);
             }
+            
             // Save Color
-            TMPro.TMP_Dropdown dropdown = PlayerColorInput.GetComponent<TMPro.TMP_Dropdown>();
-            string ColorText = dropdown.options[dropdown.value].text;
-            if(ColorText != null && !ColorText.Trim().Equals("")){
-                string ActualColorString = ConvertStringToColorString(ColorText);
-                if(!ActualColorString.Equals("")){
+            var dropdown = playerColorInput.GetComponent<TMP_Dropdown>();
+            var colorText = dropdown.options[dropdown.value].text;
+            if (colorText != null && colorText.Trim() != "")
+            {
+                var actualColorString = ConvertStringToColorString(colorText);
+                if (!actualColorString.Equals(""))
+                {
                     // Playerprefs Color
-                    PlayerPrefs.SetString("PlayerColor", ActualColorString);
+                    PlayerPrefs.SetString("PlayerColor", actualColorString);
                     //Debug.Log("Playerprefs color: " + ActualColorString);
                 }
             }
         }
 
-        private string ConvertStringToColorString(string ColorName){
-            if(ColorName.Equals("Blue")){
-                return "0,0,255";
-            }else if(ColorName.Equals("Green")){
-                return "0,255,0";
-            }else if(ColorName.Equals("Yellow")){
-                return "255,234,4";
-            }else if(ColorName.Equals("Red")){
-                return "255,0,0";
-            }
-            return "";
+        /// <summary>
+        /// Method <c>ConvertStringToColorString</c> is used to convert a string to a color string.
+        /// </summary>
+        /// <param name="colorName">The color name.</param>
+        /// <returns>The color string.</returns>
+        private string ConvertStringToColorString(string colorName)
+        {
+            return colorName switch
+            {
+                "Blue" => ColorStrings.ColorToString(Color.blue),
+                "Green" => ColorStrings.ColorToString(Color.green),
+                "Yellow" => ColorStrings.ColorToString(Color.yellow),
+                "Red" => ColorStrings.ColorToString(Color.red),
+                _ => ""
+            };
         }
 
-        private void JoinServer(ServerResponse info){
+        /// <summary>
+        /// Method <c>JoinServer</c> is used to join a server.
+        /// </summary>
+        /// <param name="info">The server info.</param>
+        private void JoinServer(ServerResponse info)
+        {
             SaveSettings();
-            networkDiscovery.StopDiscovery();
+            m_NetworkDiscovery.StopDiscovery();
             NetworkManager.singleton.StartClient(info.uri);
         }
 
-        public void CreateGame(){
-            //Debug.Log(" -> Crear partida");
-            if(!NetworkClient.isConnected && !NetworkServer.active){
-                if(!NetworkClient.active){
-                    SaveSettings();
-                    discoveredServers.Clear();
-                    NetworkManager.singleton.StartHost();
-                    networkDiscovery.AdvertiseServer();
-                }
-            }
+        /// <summary>
+        /// Method <c>CreateGame</c> is used to create a game.
+        /// </summary>
+        public void CreateGame()
+        {
+            Debug.Log("NetworkServer.active: " + NetworkServer.active);
+            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
+            Debug.Log("NetworkClient.active: " + NetworkClient.active);
+            if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
+                return;
+            SaveSettings();
+            m_DiscoveredServers.Clear();
+            NetworkManager.singleton.StartHost();
+            m_NetworkDiscovery.AdvertiseServer();
         }
 
-        public void JoinGame(){
-            //Debug.Log(" -> Unirse a partida");
-            if(!NetworkClient.isConnected && !NetworkServer.active){
-                if(!NetworkClient.active){
-                    SaveSettings();
-                    NetworkManager.singleton.networkAddress = serverIP;
-                    NetworkManager.singleton.StartClient();
-                }
-            }
+        /// <summary>
+        /// Method <c>JoinGame</c> is used to join a game.
+        /// </summary>
+        public void JoinGame()
+        {
+            Debug.Log("NetworkServer.active: " + NetworkServer.active);
+            Debug.Log("NetworkClient.isConnected: " + NetworkClient.isConnected);
+            Debug.Log("NetworkClient.active: " + NetworkClient.active);
+            if (NetworkServer.active || NetworkClient.active || NetworkClient.isConnected)
+                return;
+            SaveSettings();
+            NetworkManager.singleton.networkAddress = serverIP;
+            NetworkManager.singleton.StartClient();
         }
 
+        /// <summary>
+        /// Method <c>OnDiscoveredServer</c> is called when a server is discovered.
+        /// </summary>
+        /// <param name="info">The server info.</param>
         public void OnDiscoveredServer(ServerResponse info)
         {
             // Note that you can check the versioning to decide if you can connect to the server or not using this method
-            discoveredServers[info.serverId] = info;
+            m_DiscoveredServers[info.serverId] = info;
             //Debug.Log("Server Discovered!");
         }
     }
