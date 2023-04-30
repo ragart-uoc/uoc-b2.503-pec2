@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Mirror;
 using PEC2.Entities;
+using UnityEngine.SceneManagement;
 
 namespace PEC2.Managers
 {
@@ -172,7 +173,12 @@ namespace PEC2.Managers
 
             // This code is not run until 'RoundEnding' has finished.  At which point, check if a game winner has been found
             if (m_GameWinner != null)
+            {
                 m_GameStarted = false;
+                yield return new WaitForSeconds(3f);
+                NetworkServer.DisconnectAll();
+                SceneManager.LoadScene("MainMenu");
+            }
             else
                 m_GameLoopCoroutine = StartCoroutine(GameLoop());
         }
